@@ -114,7 +114,7 @@
 #    undef _TYPE1
 #    define _TYPE1 _CHARACTER
 #    define _CLASS1 _CLASS_S
-#    define _DIFF _ID1 + _TYPE1
+#    define _DIFF _ID1 - _TYPE1
 #    if defined(_ASCII) && _DIFF == _ASCII
 #      define _KIND1 ASCII
 #      define _KIND_LABEL1 A
@@ -175,7 +175,7 @@
 #    else
 #      error Unknown type of `_ID1`
 #    endif
-#    define _DIFF _ID1 + _TYPE1
+#    define _DIFF _ID1 - _TYPE1
 #    if _CLASS1 == _CLASS_K
 #      if defined(_K1) && _DIFF == _K1
 #        define _KIND1 K1
@@ -294,7 +294,7 @@
 #    undef _TYPE2
 #    define _TYPE2 _CHARACTER
 #    define _CLASS2 _CLASS_S
-#    define _DIFF _ID2 + _TYPE2
+#    define _DIFF _ID2 - _TYPE2
 #    if defined(_ASCII) && _DIFF == _ASCII
 #      define _KIND2 ASCII
 #      define _KIND_LABEL2 A
@@ -355,7 +355,7 @@
 #    else
 #      error Unknown type of `_ID2`
 #    endif
-#    define _DIFF _ID2 + _TYPE2
+#    define _DIFF _ID2 - _TYPE2
 #    if _CLASS2 == _CLASS_K
 #      if defined(_K1) && _DIFF == _K1
 #        define _KIND2 K1
@@ -536,7 +536,7 @@
 #    undef _TYPE
 #    define _TYPE _CHARACTER
 #    define _CLASS _CLASS_S
-#    define _DIFF _ID + _TYPE
+#    define _DIFF _ID - _TYPE
 #    if defined(_ASCII) && _DIFF == _ASCII
 #      define _KIND ASCII
 #      define _KIND_LABEL A
@@ -597,7 +597,7 @@
 #    else
 #      error Unknown type of `_ID`
 #    endif
-#    define _DIFF _ID + _TYPE
+#    define _DIFF _ID - _TYPE
 #    if _CLASS == _CLASS_K
 #      if defined(_K1) && _DIFF == _K1
 #        define _KIND K1
