@@ -1,3 +1,24 @@
+#ifdef _K1
+#  define _ID _INTEGER+_K1
+#  include "subtypes.inc"
+#endif
+#ifdef _K2
+#  define _ID _INTEGER+_K2
+#  include "subtypes.inc"
+#endif
+#ifdef _K4
+#  define _ID _INTEGER+_K4
+#  include "subtypes.inc"
+#endif
+#ifdef _K8
+#  define _ID _INTEGER+_K8
+#  include "subtypes.inc"
+#endif
+#ifdef _K16
+#  define _ID _INTEGER+_K16
+#  include "subtypes.inc"
+#endif
+
 #ifdef _HP
 #  define _ID _REAL+_HP
 #  include "subtypes.inc"

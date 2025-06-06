@@ -155,21 +155,22 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _BINARY(div)
+#if _CLASS == _CLASS_P
+#  define _PROC _BINARY(div)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
 
-#if defined(_GRADGRAD)
+#  if defined(_GRADGRAD)
     integer :: i, lo, up
     _ELEM_TYPE :: two_val
-#endif
+#  endif
     _ELEM_TYPE :: inv_val
 
     inv_val = 1 / that%val
     res%val = this%val * inv_val
     res%grad = (this%grad - res%val * that%grad) * inv_val
-#if defined(_GRADGRAD)
+#  if defined(_GRADGRAD)
     two_val = 2 * res%val
     up = 0
     do i = 1, size(res%grad)
@@ -184,7 +185,7 @@ elemental function _PROC(this, that) result(res)
             - res%val * that%gradgrad(lo:up) &
         )
     end do
-#elif defined(_DIVGRAD)
+#  elif defined(_DIVGRAD)
     res%divgrad = inv_val * ( &
         this%divgrad &
         + 2 * inv_val * dot_product( &
@@ -192,35 +193,35 @@ elemental function _PROC(this, that) result(res)
         ) &
         - res%val * that%divgrad &
     )
-#endif
+#  endif
 end function _PROC
-#undef _PROC
+#  undef _PROC
 
 
-#define _PROC _BINARY(pow)
+#  define _PROC _BINARY(pow)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
 
-#if defined(_GRADGRAD)
+#  if defined(_GRADGRAD)
     integer :: i, lo, up
-#endif
+#  endif
     _ELEM_TYPE :: inv_val, val_ratio, log_val
-#if defined(_GRADGRAD) || defined(_DIVGRAD)
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
     _ELEM_TYPE :: temp1, temp2, temp3
-#endif
+#  endif
 
     res%val = this%val ** that%val
     inv_val = 1 / this%val
     val_ratio = that%val * inv_val
     log_val = log(this%val)
     res%grad = res%val * (this%grad * val_ratio + log_val * that%grad)
-#if defined(_GRADGRAD) || defined(_DIVGRAD)
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
     temp1 = val_ratio * (val_ratio - inv_val)
     temp2 = val_ratio * log_val + inv_val
     temp3 = log_val ** 2
-#endif
-#if defined(_GRADGRAD)
+#  endif
+#  if defined(_GRADGRAD)
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
@@ -232,7 +233,7 @@ elemental function _PROC(this, that) result(res)
             + log_val * that%gradgrad(lo:up) &
         )
     end do
-#elif defined(_DIVGRAD)
+#  elif defined(_DIVGRAD)
     res%divgrad = res%val * ( &
         this%divgrad * val_ratio &
         + temp1 * dot_product(this%grad, this%grad) &
@@ -240,9 +241,10 @@ elemental function _PROC(this, that) result(res)
         + temp3 * dot_product(that%grad, that%grad) &
         + log_val * that%divgrad &
     )
-#endif
+#  endif
 end function _PROC
-#undef _PROC
+#  undef _PROC
+#endif
 
 
 #undef _PREFIX

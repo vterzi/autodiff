@@ -52,14 +52,16 @@ contains
     procedure, private :: _PROC
     generic :: operator(*) => _PROC
 #undef _PROC
-#define _PROC _BINARY(div)
+#if _CLASS == _CLASS_P
+#  define _PROC _BINARY(div)
     procedure, private :: _PROC
     generic :: operator(/) => _PROC
-#undef _PROC
-#define _PROC _BINARY(pow)
+#  undef _PROC
+#  define _PROC _BINARY(pow)
     procedure, private :: _PROC
     generic :: operator(**) => _PROC
-#undef _PROC
+#  undef _PROC
+#endif
 end type _NAME
 
 
