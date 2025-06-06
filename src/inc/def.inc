@@ -12,7 +12,7 @@
 #ifdef _ID
 #  include "../inc/id.inc"
 #  define _UNDEF_ARGS
-#elif ! (defined(_TYPE) & defined(_CLASS) & defined(_CLASS_K) & defined(_CLASS_P) & defined(_CLASS_S))
+#elif ! (defined(_TYPE) && defined(_CLASS) && defined(_CLASS_K) && defined(_CLASS_P) && defined(_CLASS_S))
 #  error The argument `_ID` or the inclusion of "id.inc" beforehand required
 #endif
 #ifdef _DEFAULT_ONLY
@@ -28,75 +28,75 @@
 #  if _CLASS == _CLASS_K
 #    ifdef _K1
 #      undef _ID
-#      define _ID (_TYPE+_K1)
+#      define _ID _TYPE + _K1
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _K2
 #      undef _ID
-#      define _ID (_TYPE+_K2)
+#      define _ID _TYPE + _K2
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _K4
 #      undef _ID
-#      define _ID (_TYPE+_K4)
+#      define _ID _TYPE + _K4
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _K8
 #      undef _ID
-#      define _ID (_TYPE+_K8)
+#      define _ID _TYPE + _K8
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _K16
 #      undef _ID
-#      define _ID (_TYPE+_K16)
+#      define _ID _TYPE + _K16
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #  elif _CLASS == _CLASS_P
 #    ifdef _HP
 #      undef _ID
-#      define _ID (_TYPE+_HP)
+#      define _ID _TYPE + _HP
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _SP
 #      undef _ID
-#      define _ID (_TYPE+_SP)
+#      define _ID _TYPE + _SP
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _DP
 #      undef _ID
-#      define _ID (_TYPE+_DP)
+#      define _ID _TYPE + _DP
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _XDP
 #      undef _ID
-#      define _ID (_TYPE+_XDP)
+#      define _ID _TYPE + _XDP
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _QP
 #      undef _ID
-#      define _ID (_TYPE+_QP)
+#      define _ID _TYPE + _QP
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #  elif _CLASS == _CLASS_S
 #    ifdef _ASCII
 #      undef _ID
-#      define _ID (_TYPE+_ASCII)
+#      define _ID _TYPE + _ASCII
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
 #    ifdef _UCS4
 #      undef _ID
-#      define _ID (_TYPE+_UCS4)
+#      define _ID _TYPE + _UCS4
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif

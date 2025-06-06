@@ -12,9 +12,9 @@
 #undef _DECL_TWO
 #ifdef _PUBLIC
 #  undef _PUBLIC
-#  define _DECL_ONE(X) public :: _UNARY(X)
-#  define _DECL_TWO(X,Y) public :: _BINARY(X,Y)
+#  define _DECL_ONE(X) public::_UNARY(X)
+#  define _DECL_TWO(X,Y) public::_BINARY(X,Y)
 #else
-#  define _DECL_ONE(X) module procedure :: _UNARY(X)
-#  define _DECL_TWO(X,Y) module procedure :: _BINARY(X,Y)
+#  define _DECL_ONE(X) module procedure::_UNARY(X)
+#  define _DECL_TWO(X,Y) module procedure::_BINARY(X,Y)
 #endif

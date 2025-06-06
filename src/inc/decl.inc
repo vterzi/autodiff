@@ -12,7 +12,7 @@
 #ifdef _ID
 #  include "../inc/id.inc"
 #  define _UNDEF_ARGS
-#elif ! (defined(_CLASS) & defined(_CLASS_K) & defined(_CLASS_P) & defined(_CLASS_S))
+#elif ! (defined(_CLASS) && defined(_CLASS_K) && defined(_CLASS_P) && defined(_CLASS_S))
 #  error The argument `_ID` or the inclusion of "id.inc" beforehand required
 #endif
 #ifdef _DEFAULT_ONLY

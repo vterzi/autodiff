@@ -42,64 +42,64 @@
 #    if _CLASS1 == _CLASS_K
 #      ifdef _K1
 #        undef _ID1
-#        define _ID1 (_TYPE1+_K1)
+#        define _ID1 _TYPE1 + _K1
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _K2
 #        undef _ID1
-#        define _ID1 (_TYPE1+_K2)
+#        define _ID1 _TYPE1 + _K2
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _K4
 #        undef _ID1
-#        define _ID1 (_TYPE1+_K4)
+#        define _ID1 _TYPE1 + _K4
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _K8
 #        undef _ID1
-#        define _ID1 (_TYPE1+_K8)
+#        define _ID1 _TYPE1 + _K8
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _K16
 #        undef _ID1
-#        define _ID1 (_TYPE1+_K16)
+#        define _ID1 _TYPE1 + _K16
 #        include "../inc/def.inc"
 #      endif
 #    elif _CLASS1 == _CLASS_P
 #      ifdef _HP
 #        undef _ID1
-#        define _ID1 (_TYPE1+_HP)
+#        define _ID1 _TYPE1 + _HP
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _SP
 #        undef _ID1
-#        define _ID1 (_TYPE1+_SP)
+#        define _ID1 _TYPE1 + _SP
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _DP
 #        undef _ID1
-#        define _ID1 (_TYPE1+_DP)
+#        define _ID1 _TYPE1 + _DP
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _XDP
 #        undef _ID1
-#        define _ID1 (_TYPE1+_XDP)
+#        define _ID1 _TYPE1 + _XDP
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _QP
 #        undef _ID1
-#        define _ID1 (_TYPE1+_QP)
+#        define _ID1 _TYPE1 + _QP
 #        include "../inc/def.inc"
 #      endif
 #    elif _CLASS1 == _CLASS_S
 #      ifdef _ASCII
 #        undef _ID1
-#        define _ID1 (_TYPE1+_ASCII)
+#        define _ID1 _TYPE1 + _ASCII
 #        include "../inc/def.inc"
 #      endif
 #      ifdef _UCS4
 #        undef _ID1
-#        define _ID1 (_TYPE1+_UCS4)
+#        define _ID1 _TYPE1 + _UCS4
 #        include "../inc/def.inc"
 #      endif
 #    endif
