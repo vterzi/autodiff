@@ -263,7 +263,7 @@
 #    else
 #      define _TYPE_LEN1(X) _TYPE1
 #    endif
-#    define _ELEM_TYPE1 _TYPE_LEN2(:)
+#    define _ELEM_TYPE1 _TYPE_LEN1(:)
 #  endif
 #  ifndef _KIND_ID1
 #    define _KIND_ID1 0
@@ -649,7 +649,7 @@
 #    else
 #      define _TYPE_LEN(X) _TYPE
 #    endif
-#    define _ELEM_TYPE _TYPE_LEN2(:)
+#    define _ELEM_TYPE _TYPE_LEN(:)
 #  endif
 #  ifndef _KIND_ID
 #    define _KIND_ID 0
