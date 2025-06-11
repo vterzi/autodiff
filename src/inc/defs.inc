@@ -1,6 +1,6 @@
 ! $1<?> = ([_DEFAULT? | _DEFAULT_ONLY?])
 ! {_FILE} + (_ID, $1<>) -> ("id.inc", "def.inc")
-! {_FILE} + (_ID1, _ID2, $1<1>, $1<2>, $1<>) -(_CLASS, _TYPE, _KEEP_ARGS)> ("id.inc", "def.inc")
+! {_FILE} + (_ID1, _ID2, $1<1>, $1<2>, $1<>) -(_CLASS_ID, _TYPE, _KEEP_ARGS)> ("id.inc", "def.inc")
 ! Include the contents of the file `_FILE` for all kinds of one basic data type `_ID` or for all kinds of two basic data types
 ! `_ID1` and `_ID2`.  If `_DEFAULT?` is defined, the file for the default kind of the corresponding type is additionally included.
 ! If `_DEFAULT_ONLY?` is defined, the file is included only for the default kind of the corresponding type.
@@ -22,8 +22,8 @@
 #    define _DEFAULT1
 #  endif
 #  define _KEEP_ARGS
-#  undef _CLASS
-#  define _CLASS _CLASS2
+#  undef _CLASS_ID
+#  define _CLASS_ID _CLASS_ID2
 #  undef _TYPE
 #  define _TYPE _TYPE2
 #  define _ID2 _ID
@@ -39,7 +39,7 @@
 #    include "../inc/def.inc"
 #  endif
 #  ifndef _DEFAULT_ONLY1
-#    if _CLASS1 == _CLASS_K
+#    if _CLASS_ID1 == _CLASS_K
 #      ifdef _K1
 #        undef _ID1
 #        define _ID1 _TYPE1 + _K1
@@ -65,7 +65,7 @@
 #        define _ID1 _TYPE1 + _K16
 #        include "../inc/def.inc"
 #      endif
-#    elif _CLASS1 == _CLASS_P
+#    elif _CLASS_ID1 == _CLASS_P
 #      ifdef _HP
 #        undef _ID1
 #        define _ID1 _TYPE1 + _HP
@@ -91,7 +91,7 @@
 #        define _ID1 _TYPE1 + _QP
 #        include "../inc/def.inc"
 #      endif
-#    elif _CLASS1 == _CLASS_S
+#    elif _CLASS_ID1 == _CLASS_S
 #      ifdef _ASCII
 #        undef _ID1
 #        define _ID1 _TYPE1 + _ASCII

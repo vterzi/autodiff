@@ -12,7 +12,7 @@
 #ifdef _ID
 #  include "../inc/id.inc"
 #  define _UNDEF_ARGS
-#elif ! (defined(_TYPE) && defined(_CLASS) && defined(_CLASS_K) && defined(_CLASS_P) && defined(_CLASS_S))
+#elif ! (defined(_TYPE) && defined(_CLASS_ID) && defined(_CLASS_K) && defined(_CLASS_P) && defined(_CLASS_S))
 #  error The argument `_ID` or the inclusion of "id.inc" beforehand required
 #endif
 #ifdef _DEFAULT_ONLY
@@ -25,7 +25,7 @@
 #  include _FILE
 #endif
 #ifndef _DEFAULT_ONLY
-#  if _CLASS == _CLASS_K
+#  if _CLASS_ID == _CLASS_K
 #    ifdef _K1
 #      undef _ID
 #      define _ID _TYPE + _K1
@@ -56,7 +56,7 @@
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
-#  elif _CLASS == _CLASS_P
+#  elif _CLASS_ID == _CLASS_P
 #    ifdef _HP
 #      undef _ID
 #      define _ID _TYPE + _HP
@@ -87,7 +87,7 @@
 #      include "../inc/id.inc"
 #      include _FILE
 #    endif
-#  elif _CLASS == _CLASS_S
+#  elif _CLASS_ID == _CLASS_S
 #    ifdef _ASCII
 #      undef _ID
 #      define _ID _TYPE + _ASCII

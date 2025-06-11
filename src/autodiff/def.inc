@@ -155,7 +155,7 @@ end function _PROC
 #undef _PROC
 
 
-#if _CLASS == _CLASS_P
+#if _CLASS_ID == _CLASS_P
 #  define _PROC _BINARY(div)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that

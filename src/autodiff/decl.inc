@@ -52,7 +52,7 @@ contains
     procedure, private :: _PROC
     generic :: operator(*) => _PROC
 #undef _PROC
-#if _CLASS == _CLASS_P
+#if _CLASS_ID == _CLASS_P
 #  define _PROC _BINARY(div)
     procedure, private :: _PROC
     generic :: operator(/) => _PROC
