@@ -1,5 +1,4 @@
 ! $1 = (
-!   _KIND_BITS, _TYPE_BITS, _DIM_BITS,
 !   _KIND_MASK, _TYPE_MASK, _DIM_MASK,
 !   _IS_TYPE, _IS_KIND, _IS_DIM,
 !   _LOGICAL, _INTEGER, _REAL, _COMPLEX, _CHARACTER,
@@ -50,21 +49,9 @@
 !   * `_TYPE_LABEL?`: type label,
 !   * `_KIND_LABEL?`: kind label,
 !   * `_DIM_LABEL?`: dimension label,
-!   * `_LABEL?`: combined label of type, kind, and dimension,
-
-!   * `_LOGICAL < _INTEGER < _REAL < _COMPLEX < _CHARACTER`,
-!   * `_K1 < _K2 < _K4 < _K8 < _K16`,
-!   * `_HP < _SP < _DP < _XDP < _QP`,
-!   * `_ASCII < _UCS4`.
+!   * `_LABEL?`: combined label of type, kind, and dimension.
 
 #include "../inc/cat.inc"
-
-#undef _KIND_BITS
-#define _KIND_BITS 5
-#undef _TYPE_BITS
-#define _TYPE_BITS 3
-#undef _DIM_BITS
-#define _DIM_BITS 3
 
 #undef _KIND_MASK
 #define _KIND_MASK ((1 << _KIND_BITS) - 1)
@@ -472,30 +459,6 @@
 #    endif
 #  endif
 #  define _LABEL2 _CAT3(_TYPE_LABEL2,_DIM_LABEL2,_KIND_LABEL2)
-! #  undef _TYPE0
-! #  undef _KIND0
-! #  undef _ELEM_TYPE0
-! #  if (_TYPE_ID1 | _KIND_ID1) >= (_TYPE_ID2 | _KIND_ID2)
-! #    undef _TYPE_ID0
-! #    undef _KIND_ID0
-! #    define _TYPE_ID0 _TYPE_ID1
-! #    define _KIND_ID0 _KIND_ID1
-! #    define _TYPE0 _TYPE1
-! #    ifdef _KIND1
-! #      define _KIND0 _KIND1
-! #    endif
-! #    define _ELEM_TYPE0 _ELEM_TYPE1
-! #  else
-! #    undef _TYPE_ID0
-! #    undef _KIND_ID0
-! #    define _TYPE_ID0 _TYPE_ID2
-! #    define _KIND_ID0 _KIND_ID2
-! #    define _TYPE0 _TYPE2
-! #    ifdef _KIND2
-! #      define _KIND0 _KIND2
-! #    endif
-! #    define _ELEM_TYPE0 _ELEM_TYPE2
-! #  endif
 #  ifndef _KEEP_ARGS
 #    undef _ID1
 #    undef _ID2
