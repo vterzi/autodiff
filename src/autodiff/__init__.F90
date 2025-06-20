@@ -119,6 +119,96 @@ module autodiff
     end interface _OP
 #undef _OP
 
+#define _OP asin
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP acos
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP atan
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP sinh
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP cosh
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP tanh
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP asinh
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP acosh
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP atanh
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
 #undef _PROC
 #undef _FILE
 

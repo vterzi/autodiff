@@ -320,16 +320,16 @@ elemental function _PROC(this) result(res)
 #  if defined(_GRADGRAD)
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: temp1
+    _ELEM_TYPE :: factor1
 #  if defined(_GRADGRAD) || defined(_DIVGRAD)
-    _ELEM_TYPE :: temp2
+    _ELEM_TYPE :: factor2
 #  endif
 
     res%val = sqrt(this%val)
-    temp1 = 1 / (2 * res%val)
-    res%grad = temp1 * this%grad
+    factor1 = 1 / (2 * res%val)
+    res%grad = factor1 * this%grad
 #  if defined(_GRADGRAD) || defined(_DIVGRAD)
-    temp2 = -temp1 / (2 * this%val)
+    factor2 = -factor1 / (2 * this%val)
 #  endif
 #  if defined(_GRADGRAD)
     allocate(res%gradgrad(size(this%gradgrad)))
@@ -338,13 +338,13 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            temp1 * this%gradgrad(lo:up) &
-            + temp2 * this%grad(i) * this%grad(:i) &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * this%grad(i) * this%grad(:i) &
         )
     end do
 #  elif defined(_DIVGRAD)
     res%divgrad = ( &
-        temp1 * this%divgrad + temp2 * dot_product(this%grad, this%grad) &
+        factor1 * this%divgrad + factor2 * dot_product(this%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -523,7 +523,7 @@ elemental function _PROC(this) result(res)
     _ELEM_TYPE :: factor
 
     res%val = tan(this%val)
-    factor = res%val**2 + 1
+    factor = 1 + res%val**2
     res%grad = factor * this%grad
 #  if defined(_GRADGRAD)
     two_val = 2 * res%val
@@ -539,6 +539,324 @@ elemental function _PROC(this) result(res)
 #  elif defined(_DIVGRAD)
     res%divgrad = factor * ( &
         this%divgrad + 2 * res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(asin)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: factor1, factor2
+
+    res%val = asin(this%val)
+    factor2 = 1 / (1 - this%val**2)
+    factor1 = sqrt(factor2)
+    res%grad = factor1 * this%grad
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
+    factor2 = factor2 * this%val
+#  endif
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(acos)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: factor1, factor2
+
+    res%val = acos(this%val)
+    factor2 = 1 / (1 - this%val**2)
+    factor1 = -sqrt(factor2)
+    res%grad = factor1 * this%grad
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
+    factor2 = factor2 * this%val
+#  endif
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(atan)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+    _ELEM_TYPE :: factor2
+#  endif
+    _ELEM_TYPE :: factor1
+
+    res%val = atan(this%val)
+    factor1 = 1 / (1 + this%val**2)
+    res%grad = factor1 * this%grad
+#  if defined(_GRADGRAD)
+    factor2 = -2 * factor1 * this%val
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = factor1 * ( &
+        this%divgrad - 2 * this%val * dot_product(res%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(sinh)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: cosh_val
+
+    res%val = sinh(this%val)
+    cosh_val = cosh(this%val)
+    res%grad = cosh_val * this%grad
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            cosh_val * this%gradgrad(lo:up) &
+            + res%val * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        cosh_val * this%divgrad + res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(cosh)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: sinh_val
+
+    res%val = cosh(this%val)
+    sinh_val = sinh(this%val)
+    res%grad = sinh_val * this%grad
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            sinh_val * this%gradgrad(lo:up) &
+            + res%val * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        sinh_val * this%divgrad + res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(tanh)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+    _ELEM_TYPE :: two_val
+#  endif
+    _ELEM_TYPE :: factor
+
+    res%val = tanh(this%val)
+    factor = 1 - res%val**2
+    res%grad = factor * this%grad
+#  if defined(_GRADGRAD)
+    two_val = 2 * res%val
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = -factor * ( &
+            this%gradgrad(lo:up) + two_val * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = -factor * ( &
+        this%divgrad + 2 * res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(asinh)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: factor1, factor2
+
+    res%val = asinh(this%val)
+    factor2 = 1 / (1 + this%val**2)
+    factor1 = sqrt(factor2)
+    res%grad = factor1 * this%grad
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
+    factor2 = -factor2 * this%val
+#  endif
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(acosh)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: factor1, factor2
+
+    res%val = acosh(this%val)
+    factor2 = -1 / (1 - this%val**2)
+    factor1 = sqrt(factor2)
+    res%grad = factor1 * this%grad
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
+    factor2 = -factor2 * this%val
+#  endif
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(atanh)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+    _ELEM_TYPE :: factor2
+#  endif
+    _ELEM_TYPE :: factor1
+
+    res%val = atanh(this%val)
+    factor1 = 1 / (1 - this%val**2)
+    res%grad = factor1 * this%grad
+#  if defined(_GRADGRAD)
+    factor2 = -2 * factor1 * this%val
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = factor1 * ( &
+        this%divgrad - 2 * this%val * dot_product(res%grad, this%grad) &
     )
 #  endif
 end function _PROC
