@@ -241,8 +241,93 @@ elemental function _PROC(this, that) result(res)
 #  endif
 end function _PROC
 #  undef _PROC
+#endif
+
+! -----------------------------------------------------------------------------
+
+#if _TYPE_ID == _COMPLEX
+#  define _PROC _UNARY(real)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_CAT3(_DERIV,R,_KIND_LABEL)) :: res
+
+    res%val = real(this%val)
+    res%grad = real(this%grad)
+#  if defined(_GRADGRAD)
+    res%gradgrad = real(this%gradgrad)
+#  elif defined(_DIVGRAD)
+    res%divgrad = real(this%divgrad)
+#  endif
+end function _PROC
+#  undef _PROC
 
 
+#  define _PROC _UNARY(aimag)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_CAT3(_DERIV,R,_KIND_LABEL)) :: res
+
+    res%val = aimag(this%val)
+    res%grad = aimag(this%grad)
+#  if defined(_GRADGRAD)
+    res%gradgrad = aimag(this%gradgrad)
+#  elif defined(_DIVGRAD)
+    res%divgrad = aimag(this%divgrad)
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(conjg)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+    res%val = conjg(this%val)
+    res%grad = conjg(this%grad)
+#  if defined(_GRADGRAD)
+    res%gradgrad = conjg(this%gradgrad)
+#  elif defined(_DIVGRAD)
+    res%divgrad = conjg(this%divgrad)
+#  endif
+end function _PROC
+#  undef _PROC
+#endif
+
+
+#define _PROC _UNARY(abs)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#if _TYPE_ID == _COMPLEX
+    res = sqrt(this * conjg(this))
+#else
+    if (this%val > 0) then
+        res = this
+    else if (this%val < 0) then
+        res = -this
+    else
+        res%val = this%val
+#  if _TYPE_ID == _REAL
+#    define _NAN ieee_value(res%val, IEEE_QUIET_NAN)
+#  else
+#    define _NAN 0 / res%val
+#  endif
+        res%grad = _NAN
+#  if defined(_GRADGRAD)
+        res%gradgrad = _NAN
+#  elif defined(_DIVGRAD)
+        res%divgrad = _NAN
+#  endif
+#  undef _NAN
+    end if
+#endif
+end function _PROC
+#undef _PROC
+
+
+#if _CLASS_ID == _CLASS_P
 #  define _PROC _UNARY(sqrt)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this

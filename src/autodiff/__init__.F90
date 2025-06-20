@@ -3,6 +3,8 @@
 #define _BINARY(X) _CAT5(_NAME,_,X,_,_NAME)
 
 module autodiff
+    use, intrinsic :: ieee_arithmetic, only: ieee_value, IEEE_QUIET_NAN
+
     implicit none
 
     private
@@ -12,6 +14,42 @@ module autodiff
 
 #define _PROC(X) _CAT5(_OP,_,_DERIV,_TYPE_LABEL,X)
 #define _FILE "decl.inc"
+
+#define _OP real
+    public :: _OP
+    interface _OP
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP aimag
+    public :: _OP
+    interface _OP
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP conjg
+    public :: _OP
+    interface _OP
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP abs
+    public :: _OP
+    interface _OP
+#define _ID _INTEGER
+#include "derivs.inc"
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
 
 #define _OP sqrt
     public :: _OP
