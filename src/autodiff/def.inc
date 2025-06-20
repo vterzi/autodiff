@@ -204,19 +204,24 @@ elemental function _PROC(this, that) result(res)
     inv_val = 1 / this%val
     val_ratio = that%val * inv_val
     log_val = log(this%val)
-    res%grad = res%val * (this%grad * val_ratio + log_val * that%grad)
 #  if defined(_GRADGRAD) || defined(_DIVGRAD)
     temp1 = val_ratio * (val_ratio - inv_val)
     temp2 = val_ratio * log_val + inv_val
     temp3 = log_val ** 2
 #  endif
+    val_ratio = val_ratio * res%val
+    log_val = log_val * res%val
+    res%grad = this%grad * val_ratio + log_val * that%grad
 #  if defined(_GRADGRAD)
+    temp1 = temp1 * res%val
+    temp2 = temp2 * res%val
+    temp3 = temp3 * res%val
     allocate(res%gradgrad(min(size(this%gradgrad), size(that%gradgrad))))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
         up = up + 1
-        res%gradgrad(lo:up) = res%val * ( &
+        res%gradgrad(lo:up) = ( &
             this%gradgrad(lo:up) * val_ratio &
             + this%grad(:i) * (this%grad(i) * temp1 + temp2 * that%grad(i)) &
             + (this%grad(i) * temp2 + temp3 * that%grad(i)) * that%grad(:i) &
@@ -224,11 +229,13 @@ elemental function _PROC(this, that) result(res)
         )
     end do
 #  elif defined(_DIVGRAD)
-    res%divgrad = res%val * ( &
+    res%divgrad = ( &
         this%divgrad * val_ratio &
-        + temp1 * dot_product(this%grad, this%grad) &
-        + 2 * temp2 * dot_product(this%grad, that%grad) &
-        + temp3 * dot_product(that%grad, that%grad) &
+        + res%val * ( &
+            temp1 * dot_product(this%grad, this%grad) &
+            + 2 * temp2 * dot_product(this%grad, that%grad) &
+            + temp3 * dot_product(that%grad, that%grad) &
+        ) &
         + log_val * that%divgrad &
     )
 #  endif
