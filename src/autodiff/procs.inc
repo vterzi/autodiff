@@ -281,4 +281,99 @@ elemental function _PROC(this) result(res)
 #  endif
 end function _PROC
 #  undef _PROC
+
+
+#  define _PROC _UNARY(exp)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+
+    res%val = exp(this%val)
+    res%grad = res%val * this%grad
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = res%val * ( &
+            this%gradgrad(lo:up) + this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = res%val * (this%divgrad + dot_product(this%grad, this%grad))
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(log)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: inv_val
+
+    res%val = log(this%val)
+    inv_val = 1 / this%val
+    res%grad = inv_val * this%grad
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            inv_val * this%gradgrad(lo:up) - res%grad(i) * res%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = inv_val * this%divgrad - dot_product(res%grad, res%grad)
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  if _TYPE_ID == _REAL
+#    define _PROC _UNARY(log10)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#    if defined(_GRADGRAD)
+    integer :: i, lo, up
+#    endif
+    _ELEM_TYPE :: log_10, inv_val
+
+    res%val = log10(this%val)
+    log_10 = log(real(10, _KIND))
+    inv_val = 1 / (this%val * log_10)
+    res%grad = inv_val * this%grad
+#    if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            inv_val * this%gradgrad(lo:up) &
+            - log_10 * res%grad(i) * res%grad(:i) &
+        )
+    end do
+#    elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        inv_val * this%divgrad &
+        - log_10 * dot_product(res%grad, res%grad) &
+    )
+#    endif
+end function _PROC
+#    undef _PROC
+#  endif
 #endif

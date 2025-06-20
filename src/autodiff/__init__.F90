@@ -12,6 +12,7 @@ module autodiff
 
 #define _PROC(X) _CAT5(_OP,_,_DERIV,_TYPE_LABEL,X)
 #define _FILE "decl.inc"
+
 #define _OP sqrt
     public :: _OP
     interface _OP
@@ -21,6 +22,35 @@ module autodiff
 #include "derivs.inc"
     end interface _OP
 #undef _OP
+
+#define _OP exp
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP log
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP log10
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
 #undef _PROC
 #undef _FILE
 
