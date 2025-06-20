@@ -120,6 +120,7 @@ elemental function _PROC(this, that) result(res)
     res%val = this%val * that%val
     res%grad = this%grad * that%val + this%val * that%grad
 #if defined(_GRADGRAD)
+    allocate(res%gradgrad(min(size(this%gradgrad), size(that%gradgrad))))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
@@ -158,6 +159,7 @@ elemental function _PROC(this, that) result(res)
     res%val = this%val * inv_val
     res%grad = (this%grad - res%val * that%grad) * inv_val
 #  if defined(_GRADGRAD)
+    allocate(res%gradgrad(min(size(this%gradgrad), size(that%gradgrad))))
     two_val = 2 * res%val
     up = 0
     do i = 1, size(res%grad)
@@ -209,6 +211,7 @@ elemental function _PROC(this, that) result(res)
     temp3 = log_val ** 2
 #  endif
 #  if defined(_GRADGRAD)
+    allocate(res%gradgrad(min(size(this%gradgrad), size(that%gradgrad))))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
