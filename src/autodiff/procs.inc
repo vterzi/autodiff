@@ -159,8 +159,8 @@ elemental function _PROC(this, that) result(res)
     res%val = this%val * inv_val
     res%grad = (this%grad - res%val * that%grad) * inv_val
 #  if defined(_GRADGRAD)
-    allocate(res%gradgrad(min(size(this%gradgrad), size(that%gradgrad))))
     two_val = 2 * res%val
+    allocate(res%gradgrad(min(size(this%gradgrad), size(that%gradgrad))))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
@@ -275,8 +275,7 @@ elemental function _PROC(this) result(res)
     end do
 #  elif defined(_DIVGRAD)
     res%divgrad = ( &
-        temp1 * this%divgrad &
-        + temp2 * dot_product(this%grad, this%grad) &
+        temp1 * this%divgrad + temp2 * dot_product(this%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -369,11 +368,110 @@ elemental function _PROC(this) result(res)
     end do
 #    elif defined(_DIVGRAD)
     res%divgrad = ( &
-        inv_val * this%divgrad &
-        - log_10 * dot_product(res%grad, res%grad) &
+        inv_val * this%divgrad - log_10 * dot_product(res%grad, res%grad) &
     )
 #    endif
 end function _PROC
 #    undef _PROC
 #  endif
+
+
+#  define _PROC _UNARY(sin)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: cos_val
+
+    res%val = sin(this%val)
+    cos_val = cos(this%val)
+    res%grad = cos_val * this%grad
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            cos_val * this%gradgrad(lo:up) &
+            - res%val * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        cos_val * this%divgrad - res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(cos)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: sin_val
+
+    res%val = cos(this%val)
+    sin_val = -sin(this%val)
+    res%grad = sin_val * this%grad
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            sin_val * this%gradgrad(lo:up) &
+            - res%val * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        sin_val * this%divgrad - res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _UNARY(tan)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+    _ELEM_TYPE :: two_val
+#  endif
+    _ELEM_TYPE :: factor
+
+    res%val = tan(this%val)
+    factor = res%val**2 + 1
+    res%grad = factor * this%grad
+#  if defined(_GRADGRAD)
+    two_val = 2 * res%val
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = factor * ( &
+            this%gradgrad(lo:up) + two_val * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = factor * ( &
+        this%divgrad + 2 * res%val * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
 #endif

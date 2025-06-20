@@ -51,6 +51,36 @@ module autodiff
     end interface _OP
 #undef _OP
 
+#define _OP sin
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP cos
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
+#define _OP tan
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "derivs.inc"
+#define _ID _COMPLEX
+#include "derivs.inc"
+    end interface _OP
+#undef _OP
+
 #undef _PROC
 #undef _FILE
 
