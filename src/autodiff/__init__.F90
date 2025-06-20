@@ -10,6 +10,20 @@ module autodiff
 #define _FILE "decl.inc"
 #include "types.inc"
 
+#define _PROC(X) _CAT5(_OP,_,_DERIV,_TYPE_LABEL,X)
+#define _FILE "interface.inc"
+#define _OP sqrt
+    public :: _OP
+    interface _OP
+#define _ID _REAL
+#include "subtypes.inc"
+#define _ID _COMPLEX
+#include "subtypes.inc"
+    end interface _OP
+#undef _OP
+#undef _PROC
+#undef _FILE
+
 contains
 
 #define _FILE "def.inc"

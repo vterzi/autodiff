@@ -241,4 +241,44 @@ elemental function _PROC(this, that) result(res)
 #  endif
 end function _PROC
 #  undef _PROC
+
+
+#  define _PROC _UNARY(sqrt)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    type(_NAME) :: res
+
+#  if defined(_GRADGRAD)
+    integer :: i, lo, up
+#  endif
+    _ELEM_TYPE :: temp1
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
+    _ELEM_TYPE :: temp2
+#  endif
+
+    res%val = sqrt(this%val)
+    temp1 = 1 / (2 * res%val)
+    res%grad = temp1 * this%grad
+#  if defined(_GRADGRAD) || defined(_DIVGRAD)
+    temp2 = -temp1 / (2 * this%val)
+#  endif
+#  if defined(_GRADGRAD)
+    allocate(res%gradgrad(size(this%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            temp1 * this%gradgrad(lo:up) &
+            + temp2 * this%grad(i) * this%grad(:i) &
+        )
+    end do
+#  elif defined(_DIVGRAD)
+    res%divgrad = ( &
+        temp1 * this%divgrad &
+        + temp2 * dot_product(this%grad, this%grad) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
 #endif
