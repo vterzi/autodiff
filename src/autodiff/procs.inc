@@ -200,14 +200,14 @@ elemental function _PROC(this, that) result(res)
     _ELEM_TYPE :: temp1, temp2, temp3
 #  endif
 
-    res%val = this%val ** that%val
+    res%val = this%val**that%val
     inv_val = 1 / this%val
     val_ratio = that%val * inv_val
     log_val = log(this%val)
 #  if defined(_GRADGRAD) || defined(_DIVGRAD)
     temp1 = val_ratio * (val_ratio - inv_val)
     temp2 = val_ratio * log_val + inv_val
-    temp3 = log_val ** 2
+    temp3 = log_val**2
 #  endif
     val_ratio = val_ratio * res%val
     log_val = log_val * res%val
