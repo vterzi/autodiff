@@ -7,10 +7,6 @@ type, public :: _NAME
     _ELEM_TYPE :: divgrad
 #endif
 contains
-#define _PROC _BINARY(assign)
-    procedure, private :: _PROC
-    generic :: assignment(=) => _PROC
-#undef _PROC
 #define _PROC _BINARY(eq)
     procedure, private :: _PROC
     generic :: operator(==) => _PROC

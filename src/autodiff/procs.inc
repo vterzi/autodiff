@@ -1,19 +1,3 @@
-#define _PROC _BINARY(assign)
-elemental subroutine _PROC(this, that)
-    class(_NAME), intent(inout) :: this
-    class(_NAME), intent(in) :: that
-
-    this%val = that%val
-    this%grad = that%grad
-#if defined(_GRADGRAD)
-    this%gradgrad = that%gradgrad
-#elif defined(_DIVGRAD)
-    this%divgrad = that%divgrad
-#endif
-end subroutine _PROC
-#undef _PROC
-
-
 #define _PROC _BINARY(eq)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
