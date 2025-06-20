@@ -1,9 +1,17 @@
 #include "../inc/id.inc"
 
+#define _DERIV Grad
 #include _FILE
-#define _GRADGRAD
-#include _FILE
-#define _DIVGRAD
-#include _FILE
+#undef _DERIV
 
-#undef _ID
+#define _GRADGRAD
+#define _DERIV Gradgrad
+#include _FILE
+#undef _GRADGRAD
+#undef _DERIV
+
+#define _DIVGRAD
+#define _DERIV Divgrad
+#include _FILE
+#undef _DIVGRAD
+#undef _DERIV

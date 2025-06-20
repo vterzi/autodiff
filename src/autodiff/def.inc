@@ -1,16 +1,3 @@
-#if defined(_GRADGRAD)
-#  define _PREFIX Gradgrad
-#elif defined(_DIVGRAD)
-#  define _PREFIX Divgrad
-#else
-#  define _PREFIX Grad
-#endif
-
-#define _NAME _CAT3(_PREFIX,_TYPE_LABEL,_KIND_LABEL)
-#define _UNARY(X) _CAT3(X,_,_NAME)
-#define _BINARY(X) _CAT5(_NAME,_,X,_,_NAME)
-
-
 #define _PROC _BINARY(assign)
 elemental subroutine _PROC(this, that)
     class(_NAME), intent(inout) :: this
@@ -245,12 +232,3 @@ elemental function _PROC(this, that) result(res)
 end function _PROC
 #  undef _PROC
 #endif
-
-
-#undef _PREFIX
-#undef _NAME
-#undef _UNARY
-#undef _BINARY
-
-#undef _GRADGRAD
-#undef _DIVGRAD
