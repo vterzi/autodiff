@@ -7,18 +7,18 @@ module autodiff
 
     private
 
-#define _FILE "decl.inc"
-#include "types.inc"
+#define _FILE "type.inc"
+#include "type-kinds.inc"
 
 #define _PROC(X) _CAT5(_OP,_,_DERIV,_TYPE_LABEL,X)
-#define _FILE "interface.inc"
+#define _FILE "decl.inc"
 #define _OP sqrt
     public :: _OP
     interface _OP
 #define _ID _REAL
-#include "subtypes.inc"
+#include "derivs.inc"
 #define _ID _COMPLEX
-#include "subtypes.inc"
+#include "derivs.inc"
     end interface _OP
 #undef _OP
 #undef _PROC
@@ -26,7 +26,7 @@ module autodiff
 
 contains
 
-#define _FILE "def.inc"
-#include "types.inc"
+#define _FILE "procs.inc"
+#include "type-kinds.inc"
 
 end module autodiff

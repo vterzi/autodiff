@@ -1,52 +1,15 @@
-type, public :: _NAME
-    _ELEM_TYPE :: val
-    _ELEM_TYPE, allocatable :: grad(:)
-#if defined(_GRADGRAD)
-    _ELEM_TYPE, allocatable :: gradgrad(:)
-#elif defined(_DIVGRAD)
-    _ELEM_TYPE :: divgrad
+#ifdef _HP
+module procedure::_PROC(HP)
 #endif
-contains
-#define _PROC _BINARY(assign)
-    procedure, private :: _PROC
-    generic :: assignment(=) => _PROC
-#undef _PROC
-#define _PROC _BINARY(eq)
-    procedure, private :: _PROC
-    generic :: operator(==) => _PROC
-#undef _PROC
-#define _PROC _BINARY(ne)
-    procedure, private :: _PROC
-    generic :: operator(/=) => _PROC
-#undef _PROC
-#define _PROC _UNARY(pos)
-    procedure, private :: _PROC
-    generic :: operator(+) => _PROC
-#undef _PROC
-#define _PROC _UNARY(neg)
-    procedure, private :: _PROC
-    generic :: operator(-) => _PROC
-#undef _PROC
-#define _PROC _BINARY(add)
-    procedure, private :: _PROC
-    generic :: operator(+) => _PROC
-#undef _PROC
-#define _PROC _BINARY(sub)
-    procedure, private :: _PROC
-    generic :: operator(-) => _PROC
-#undef _PROC
-#define _PROC _BINARY(mul)
-    procedure, private :: _PROC
-    generic :: operator(*) => _PROC
-#undef _PROC
-#if _CLASS_ID == _CLASS_P
-#  define _PROC _BINARY(div)
-    procedure, private :: _PROC
-    generic :: operator(/) => _PROC
-#  undef _PROC
-#  define _PROC _BINARY(pow)
-    procedure, private :: _PROC
-    generic :: operator(**) => _PROC
-#  undef _PROC
+#ifdef _SP
+module procedure::_PROC(SP)
 #endif
-end type _NAME
+#ifdef _DP
+module procedure::_PROC(DP)
+#endif
+#ifdef _XDP
+module procedure::_PROC(XDP)
+#endif
+#ifdef _QP
+module procedure::_PROC(QP)
+#endif
