@@ -11,4 +11,3 @@
 #include "types.inc"
 #undef _DIVGRAD
 #undef _DERIV
-#undef _TYPE_ID

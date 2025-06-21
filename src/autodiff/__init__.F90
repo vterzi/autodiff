@@ -13,7 +13,8 @@
 #define _COMPLEX (1 << (_KIND_BITS + 2))
 
 #define _ELEM_TYPE _TYPE(_KIND)
-#define _NAME _CAT3(_DERIV,_TYPE_LABEL,_KIND_LABEL)
+#define _LABEL _CAT(_TYPE_LABEL,_KIND_LABEL)
+#define _NAME _CAT(_DERIV,_LABEL)
 #define _TYPE_UNARY_OP(X) _CAT3(X,_,_NAME)
 #define _TYPE_BINARY_OP(X) _CAT5(_NAME,_,X,_,_NAME)
 
@@ -25,15 +26,12 @@ module autodiff
     private
 
 #define _FILE "type.inc"
-#define _TYPE_ID _INTEGER
+#define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
-#define _TYPE_ID _REAL
-#include "derivs.inc"
-#define _TYPE_ID _COMPLEX
-#include "derivs.inc"
+#undef _TYPE_IDS
 #undef _FILE
 
-#define _PROC _CAT5(_OP,_,_DERIV,_TYPE_LABEL,_KIND_LABEL)
+#define _PROC _TYPE_UNARY_OP(_OP)
 #define _FILE "mod_proc_decl.inc"
 #define _OP real
 #define _TYPE_IDS (_COMPLEX)
@@ -101,12 +99,9 @@ module autodiff
 contains
 
 #define _FILE "procs.inc"
-#define _TYPE_ID _INTEGER
+#define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
-#define _TYPE_ID _REAL
-#include "derivs.inc"
-#define _TYPE_ID _COMPLEX
-#include "derivs.inc"
+#undef _TYPE_IDS
 #undef _FILE
 
 end module autodiff
