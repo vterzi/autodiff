@@ -50,14 +50,7 @@ program kinds
         prev_kind = curr_kind
     end do
 
-    curr_kind = selected_char_kind('ASCII')
-    if (curr_kind >= 0) print *, 'ASCII=', curr_kind
-    curr_kind = selected_char_kind('ISO_10646')
-    if (curr_kind >= 0) print *, 'UCS4=', curr_kind
-
-    print *, 'LK=', kind(.false.)
     print *, 'IK=', kind(0)
     print *, 'RK=', kind(0.)
     print *, 'CK=', kind((0, 0))
-    print *, 'SK=', kind('')
 end program kinds
