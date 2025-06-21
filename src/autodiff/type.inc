@@ -1,4 +1,5 @@
 type, public :: _NAME
+    private
     _ELEM_TYPE :: val
     _ELEM_TYPE, allocatable :: grad(:)
 #if defined(_GRADGRAD)
@@ -7,6 +8,22 @@ type, public :: _NAME
     _ELEM_TYPE :: divgrad
 #endif
 contains
+#define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
+    _PROC(get_val)
+#undef _PROC
+#define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
+    _PROC(get_grad)
+#undef _PROC
+#if defined(_GRADGRAD)
+#  define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
+    _PROC(get_gradgrad)
+#  undef _PROC
+#endif
+#if defined(_GRADGRAD) || defined(_DIVGRAD)
+#  define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
+    _PROC(get_divgrad)
+#  undef _PROC
+#endif
 #define _PROC _TYPE_BINARY_OP(eq)
 #define _OP operator(==)
 #include "type_generic.inc"
@@ -37,3 +54,7 @@ contains
 #  include "type_generic.inc"
 #endif
 end type _NAME
+
+interface _NAME
+    module procedure :: _TYPE_UNARY_OP(new)
+end interface _NAME

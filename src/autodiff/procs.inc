@@ -1,3 +1,144 @@
+#define _PROC _TYPE_UNARY_OP(new)
+pure function _PROC(val, grad &
+#if defined(_GRADGRAD)
+    , gradgrad, upper &
+#elif defined(_DIVGRAD)
+    , divgrad &
+#endif
+) result(this)
+    _ELEM_TYPE, intent(in) :: val, grad(:)
+#if defined(_GRADGRAD)
+    _ELEM_TYPE, intent(in) :: gradgrad(:, :)
+    logical, intent(in) :: upper
+#elif defined(_DIVGRAD)
+    _ELEM_TYPE, intent(in) :: divgrad
+#endif
+    type(_NAME) :: this
+
+#if defined(_GRADGRAD)
+    integer :: n, n1, n2, i, lo, up, up_
+#endif
+
+    this%val = val
+    this%grad = grad
+#if defined(_GRADGRAD)
+    n = size(grad)
+    n1 = size(gradgrad, 1)
+    n2 = size(gradgrad, 2)
+    allocate(this%gradgrad(n * (n + 1) / 2))
+    if (upper) then
+        do i = 1, n
+            lo = up + i
+            up = up + 1
+            if (i <= n2) then
+                if (i <= n1) then
+                    this%gradgrad(lo:up) = gradgrad(:i, i)
+                else
+                    up_ = up + n1 - i
+                    this%gradgrad(lo:up_) = gradgrad(:n1, i)
+                    up_ = up_ + 1
+                    this%gradgrad(up_:up) = 0
+                end if
+            else
+                this%gradgrad(lo:up) = 0
+            end if
+        end do
+    else
+        do i = 1, n
+            lo = up + i
+            up = up + 1
+            if (i <= n1) then
+                if (i <= n2) then
+                    this%gradgrad(lo:up) = gradgrad(i, :i)
+                else
+                    up_ = up + n2 - i
+                    this%gradgrad(lo:up_) = gradgrad(i, :n2)
+                    up_ = up_ + 1
+                    this%gradgrad(up_:up) = 0
+                end if
+            else
+                this%gradgrad(lo:up) = 0
+            end if
+        end do
+    end if
+#elif defined(_DIVGRAD)
+    this%divgrad = divgrad
+#endif
+end function _PROC
+#undef _PROC
+
+
+#define _PROC _TYPE_UNARY_OP(get_val)
+pure function _PROC(this) result(val)
+    class(_NAME), intent(in) :: this
+    _ELEM_TYPE :: val
+
+    val = this%val
+end function _PROC
+#undef _PROC
+
+
+#define _PROC _TYPE_UNARY_OP(get_grad)
+pure function _PROC(this) result(grad)
+    class(_NAME), intent(in) :: this
+    _ELEM_TYPE :: grad(size(this%grad))
+
+    grad = this%grad
+end function _PROC
+#undef _PROC
+
+
+#if defined(_GRADGRAD)
+#  define _PROC _TYPE_UNARY_OP(get_gradgrad)
+pure function _PROC(this) result(gradgrad)
+    class(_NAME), intent(in) :: this
+    _ELEM_TYPE :: gradgrad(size(this%grad), size(this%grad))
+
+    integer :: n, i1, i2, lo, up
+
+    n = size(this%grad)
+    up = 0
+    do i1 = 1, n
+        lo = up + i1
+        up = up + 1
+        gradgrad(:i1, i1) = this%gradgrad(lo:up)
+    end do
+    do i1 = 2, n
+        do i2 = 1, i1 - 1
+            gradgrad(i1, i2) = gradgrad(i2, i1)
+        end do
+    end do
+end function _PROC
+#  undef _PROC
+#endif
+
+
+#if defined(_GRADGRAD) || defined(_DIVGRAD)
+#  define _PROC _TYPE_UNARY_OP(get_divgrad)
+pure function _PROC(this) result(divgrad)
+    class(_NAME), intent(in) :: this
+    _ELEM_TYPE :: divgrad
+
+#  if defined(_GRADGRAD)
+    integer :: i, idx
+#  endif
+
+#  if defined(_GRADGRAD)
+    divgrad = 0
+    idx = 0
+    do i = 1, size(this%grad)
+        idx = idx + i
+        divgrad = divgrad + this%gradgrad(idx)
+    end do
+#  elif defined(_DIVGRAD)
+    divgrad = this%divgrad
+#  endif
+end function _PROC
+#  undef _PROC
+#endif
+
+! -----------------------------------------------------------------------------
+
 #define _PROC _TYPE_BINARY_OP(eq)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
