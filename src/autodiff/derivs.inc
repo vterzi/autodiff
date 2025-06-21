@@ -1,4 +1,4 @@
-#include "../inc/id.inc"
+#include "id.inc"
 
 #define _DERIV Grad
 #include _FILE

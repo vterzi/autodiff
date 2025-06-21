@@ -51,55 +51,6 @@
 !   * `_DIM_LABEL?`: dimension label,
 !   * `_LABEL?`: combined label of type, kind, and dimension.
 
-#include "../inc/cat.inc"
-
-#undef _KIND_MASK
-#define _KIND_MASK ((1 << _KIND_BITS) - 1)
-#undef _TYPE_MASK
-#define _TYPE_MASK (((1 << _TYPE_BITS) - 1) << _KIND_BITS)
-#undef _DIM_MASK
-#define _DIM_MASK (((1 << _DIM_BITS) - 1) << (_KIND_BITS + _TYPE_BITS))
-
-#undef _IS_TYPE
-#define _IS_TYPE(ID,TYPE) (((ID) & _TYPE_MASK) == TYPE)
-#undef _IS_KIND
-#define _IS_KIND(ID,KIND) (((ID) & _KIND_MASK) == KIND)
-#undef _IS_DIM
-#define _IS_DIM(ID,DIM) (((ID) & _DIM_MASK) == DIM)
-
-#undef _LOGICAL
-#define _LOGICAL (1 << _KIND_BITS)
-#undef _INTEGER
-#define _INTEGER (2 << _KIND_BITS)
-#undef _REAL
-#define _REAL (3 << _KIND_BITS)
-#undef _COMPLEX
-#define _COMPLEX (4 << _KIND_BITS)
-#undef _CHARACTER
-#define _CHARACTER (5 << _KIND_BITS)
-
-#undef _CLASS_K
-#define _CLASS_K _INTEGER
-#undef _CLASS_P
-#define _CLASS_P _REAL
-#undef _CLASS_S
-#define _CLASS_S _CHARACTER
-
-#undef _1_DIMS
-#define _1_DIMS (1 << (_KIND_BITS + _TYPE_BITS))
-#undef _2_DIMS
-#define _2_DIMS (2 << (_KIND_BITS + _TYPE_BITS))
-#undef _3_DIMS
-#define _3_DIMS (3 << (_KIND_BITS + _TYPE_BITS))
-#undef _4_DIMS
-#define _4_DIMS (4 << (_KIND_BITS + _TYPE_BITS))
-#undef _5_DIMS
-#define _5_DIMS (5 << (_KIND_BITS + _TYPE_BITS))
-#undef _6_DIMS
-#define _6_DIMS (6 << (_KIND_BITS + _TYPE_BITS))
-#undef _7_DIMS
-#define _7_DIMS (7 << (_KIND_BITS + _TYPE_BITS))
-
 #undef _N_IDS
 #if defined(_ID1) && defined(_ID2)
 #  define _N_IDS 2

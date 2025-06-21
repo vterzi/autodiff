@@ -1,3 +1,6 @@
+#include "cat.inc"
+#include "init.inc"
+
 #define _NAME _CAT3(_DERIV,_TYPE_LABEL,_KIND_LABEL)
 #define _UNARY(X) _CAT3(X,_,_NAME)
 #define _BINARY(X) _CAT5(_NAME,_,X,_,_NAME)
@@ -16,198 +19,64 @@ module autodiff
 #define _FILE "decl.inc"
 
 #define _OP real
-    public :: _OP
-    interface _OP
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_c.inc"
 
 #define _OP aimag
-    public :: _OP
-    interface _OP
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_c.inc"
 
 #define _OP conjg
-    public :: _OP
-    interface _OP
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_c.inc"
 
 #define _OP abs
-    public :: _OP
-    interface _OP
-#define _ID _INTEGER
-#include "derivs.inc"
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_irc.inc"
 
 #define _OP sqrt
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP exp
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP log
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP log10
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_r.inc"
 
 #define _OP sin
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP cos
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP tan
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP asin
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP acos
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP atan
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP sinh
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP cosh
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP tanh
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP asinh
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP acosh
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #define _OP atanh
-    public :: _OP
-    interface _OP
-#define _ID _REAL
-#include "derivs.inc"
-#define _ID _COMPLEX
-#include "derivs.inc"
-    end interface _OP
-#undef _OP
+#include "iface_rc.inc"
 
 #undef _PROC
 #undef _FILE
