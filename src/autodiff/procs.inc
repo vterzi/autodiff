@@ -1,4 +1,4 @@
-#define _PROC _BINARY(eq)
+#define _PROC _BINARY_TYPE_OP(eq)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     logical :: res
@@ -13,7 +13,7 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _BINARY(ne)
+#define _PROC _BINARY_TYPE_OP(ne)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     logical :: res
@@ -28,7 +28,7 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _UNARY(pos)
+#define _PROC _UNARY_TYPE_OP(pos)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -44,7 +44,7 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _UNARY(neg)
+#define _PROC _UNARY_TYPE_OP(neg)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -60,7 +60,7 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _BINARY(add)
+#define _PROC _BINARY_TYPE_OP(add)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
@@ -76,7 +76,7 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _BINARY(sub)
+#define _PROC _BINARY_TYPE_OP(sub)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
@@ -92,7 +92,7 @@ end function _PROC
 #undef _PROC
 
 
-#define _PROC _BINARY(mul)
+#define _PROC _BINARY_TYPE_OP(mul)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
@@ -128,7 +128,7 @@ end function _PROC
 
 
 #if _CLASS_ID == _CLASS_P
-#  define _PROC _BINARY(div)
+#  define _PROC _BINARY_TYPE_OP(div)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
@@ -171,7 +171,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _BINARY(pow)
+#  define _PROC _BINARY_TYPE_OP(pow)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
@@ -230,7 +230,7 @@ end function _PROC
 ! -----------------------------------------------------------------------------
 
 #if _TYPE_ID == _COMPLEX
-#  define _PROC _UNARY(real)
+#  define _PROC _UNARY_TYPE_OP(real)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_CAT3(_DERIV,R,_KIND_LABEL)) :: res
@@ -246,7 +246,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(aimag)
+#  define _PROC _UNARY_TYPE_OP(aimag)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_CAT3(_DERIV,R,_KIND_LABEL)) :: res
@@ -262,7 +262,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(conjg)
+#  define _PROC _UNARY_TYPE_OP(conjg)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -279,7 +279,7 @@ end function _PROC
 #endif
 
 
-#define _PROC _UNARY(abs)
+#define _PROC _UNARY_TYPE_OP(abs)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -312,7 +312,7 @@ end function _PROC
 
 
 #if _CLASS_ID == _CLASS_P
-#  define _PROC _UNARY(sqrt)
+#  define _PROC _UNARY_TYPE_OP(sqrt)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -351,7 +351,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(exp)
+#  define _PROC _UNARY_TYPE_OP(exp)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -379,7 +379,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(log)
+#  define _PROC _UNARY_TYPE_OP(log)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -410,7 +410,7 @@ end function _PROC
 
 
 #  if _TYPE_ID == _REAL
-#    define _PROC _UNARY(log10)
+#    define _PROC _UNARY_TYPE_OP(log10)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -445,7 +445,7 @@ end function _PROC
 #  endif
 
 
-#  define _PROC _UNARY(sin)
+#  define _PROC _UNARY_TYPE_OP(sin)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -478,7 +478,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(cos)
+#  define _PROC _UNARY_TYPE_OP(cos)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -511,7 +511,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(tan)
+#  define _PROC _UNARY_TYPE_OP(tan)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -545,7 +545,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(asin)
+#  define _PROC _UNARY_TYPE_OP(asin)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -582,7 +582,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(acos)
+#  define _PROC _UNARY_TYPE_OP(acos)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -619,7 +619,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(atan)
+#  define _PROC _UNARY_TYPE_OP(atan)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -654,7 +654,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(sinh)
+#  define _PROC _UNARY_TYPE_OP(sinh)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -687,7 +687,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(cosh)
+#  define _PROC _UNARY_TYPE_OP(cosh)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -720,7 +720,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(tanh)
+#  define _PROC _UNARY_TYPE_OP(tanh)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -754,7 +754,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(asinh)
+#  define _PROC _UNARY_TYPE_OP(asinh)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -791,7 +791,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(acosh)
+#  define _PROC _UNARY_TYPE_OP(acosh)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
@@ -828,7 +828,7 @@ end function _PROC
 #  undef _PROC
 
 
-#  define _PROC _UNARY(atanh)
+#  define _PROC _UNARY_TYPE_OP(atanh)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
