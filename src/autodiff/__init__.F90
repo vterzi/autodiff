@@ -109,12 +109,39 @@ module autodiff
 #undef _PROC
 #undef _FILE
 
+#define _PROC _TYPES_BINARY_OP(_OP_NAME)
+#define _FILE "mod_procs_decl.inc"
+
+#define _OP assignment(=)
+#define _OP_NAME assign
+    public :: _OP
+    interface _OP
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#include "derivs.inc"
+#undef _TYPE_IDS1
+#undef _TYPE_IDS2
+    end interface _OP
+#undef _OP
+#undef _OP_NAME
+
+#undef _PROC
+#undef _FILE
+
 contains
 
 #define _FILE "proc.inc"
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
 #undef _TYPE_IDS
+#undef _FILE
+
+#define _FILE "procs.inc"
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#include "derivs.inc"
+#undef _TYPE_IDS1
+#undef _TYPE_IDS2
 #undef _FILE
 
 end module autodiff
