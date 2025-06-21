@@ -27,8 +27,6 @@ if("${run_result}" EQUAL 0)
         math(EXPR kind_bits "${kind_bits} + 1")
     endwhile()
     add_compile_definitions("_KIND_BITS=${kind_bits}")
-    add_compile_definitions("_TYPE_BITS=3")
-    add_compile_definitions("_DIM_BITS=3")
 else()
     message(FATAL_ERROR
         "Failed to determine available kinds of basic data types"

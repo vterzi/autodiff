@@ -7,32 +7,32 @@ type, public :: _NAME
     _ELEM_TYPE :: divgrad
 #endif
 contains
-#define _PROC _BINARY_TYPE_OP(eq)
+#define _PROC _TYPE_BINARY_OP(eq)
 #define _OP operator(==)
 #include "type_generic.inc"
-#define _PROC _BINARY_TYPE_OP(ne)
+#define _PROC _TYPE_BINARY_OP(ne)
 #define _OP operator(/=)
 #include "type_generic.inc"
-#define _PROC _UNARY_TYPE_OP(pos)
+#define _PROC _TYPE_UNARY_OP(pos)
 #define _OP operator(+)
 #include "type_generic.inc"
-#define _PROC _UNARY_TYPE_OP(neg)
+#define _PROC _TYPE_UNARY_OP(neg)
 #define _OP operator(-)
 #include "type_generic.inc"
-#define _PROC _BINARY_TYPE_OP(add)
+#define _PROC _TYPE_BINARY_OP(add)
 #define _OP operator(+)
 #include "type_generic.inc"
-#define _PROC _BINARY_TYPE_OP(sub)
+#define _PROC _TYPE_BINARY_OP(sub)
 #define _OP operator(-)
 #include "type_generic.inc"
-#define _PROC _BINARY_TYPE_OP(mul)
+#define _PROC _TYPE_BINARY_OP(mul)
 #define _OP operator(*)
 #include "type_generic.inc"
-#if _CLASS_ID == _CLASS_P
-#  define _PROC _BINARY_TYPE_OP(div)
+#if (_TYPE_ID == _REAL) || (_TYPE_ID == _COMPLEX)
+#  define _PROC _TYPE_BINARY_OP(div)
 #  define _OP operator(/)
 #  include "type_generic.inc"
-#  define _PROC _BINARY_TYPE_OP(pow)
+#  define _PROC _TYPE_BINARY_OP(pow)
 #  define _OP operator(**)
 #  include "type_generic.inc"
 #endif
