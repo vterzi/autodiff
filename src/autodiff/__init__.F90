@@ -3,10 +3,6 @@
 #define _CAT3(A,B,C) _CAT(_CAT(A,B),C)
 #define _CAT4(A,B,C,D) _CAT(_CAT3(A,B,C),D)
 #define _CAT5(A,B,C,D,E) _CAT(_CAT4(A,B,C,D),E)
-#define _CAT6(A,B,C,D,E,F) _CAT(_CAT5(A,B,C,D,E),F)
-#define _CAT7(A,B,C,D,E,F,G) _CAT(_CAT6(A,B,C,D,E,F),G)
-#define _CAT8(A,B,C,D,E,F,G,H) _CAT(_CAT7(A,B,C,D,E,F,G),H)
-#define _CAT9(A,B,C,D,E,F,G,H,I) _CAT(_CAT8(A,B,C,D,E,F,G,H),I)
 
 #define _INTEGER (1 << (_KIND_BITS))
 #define _REAL (1 << (_KIND_BITS + 1))

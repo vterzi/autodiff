@@ -1,1 +1,1 @@
-module procedure::_PROC
+module procedure :: _PROC
