@@ -8,11 +8,28 @@
 #define _REAL (1 << (_KIND_BITS + 1))
 #define _COMPLEX (1 << (_KIND_BITS + 2))
 
+#define _VAL (1 << (_KIND_BITS + 3))
+#define _GRAD (1 << (_KIND_BITS + 4))
+#define _GRADGRAD (1 << (_KIND_BITS + 5))
+#define _DIVGRAD (1 << (_KIND_BITS + 6))
+
 #define _ELEM_TYPE _TYPE(_KIND)
+#define _ELEM_TYPE1 _TYPE1(_KIND1)
+#define _ELEM_TYPE2 _TYPE1(_KIND2)
+#define _CONV(X) _TYPE_CONV(X, kind=_KIND)
+#define _CONV1(X) _TYPE_CONV1(X, kind=_KIND1)
+#define _CONV2(X) _TYPE_CONV2(X, kind=_KIND2)
 #define _LABEL _CAT(_TYPE_LABEL,_KIND_LABEL)
+#define _LABEL1 _CAT(_TYPE_LABEL1,_KIND_LABEL1)
+#define _LABEL2 _CAT(_TYPE_LABEL2,_KIND_LABEL2)
 #define _NAME _CAT(_DERIV,_LABEL)
+#define _NAME1 _CAT(_DERIV1,_LABEL1)
+#define _NAME2 _CAT(_DERIV2,_LABEL2)
 #define _TYPE_UNARY_OP(X) _CAT3(X,_,_NAME)
 #define _TYPE_BINARY_OP(X) _CAT5(_NAME,_,X,_,_NAME)
+#define _LT_TYPE_BINARY_OP(X) _CAT5(_NAME1,_,X,_,_LABEL2)
+#define _RT_TYPE_BINARY_OP(X) _CAT5(_LABEL1,_,X,_,_NAME2)
+#define _TYPES_BINARY_OP(X) _CAT5(_NAME1,_,X,_,_NAME2)
 
 module autodiff
     use, intrinsic :: ieee_arithmetic, only: ieee_value, IEEE_QUIET_NAN
@@ -94,7 +111,7 @@ module autodiff
 
 contains
 
-#define _FILE "procs.inc"
+#define _FILE "proc.inc"
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
 #undef _TYPE_IDS

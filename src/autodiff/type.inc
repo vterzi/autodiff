@@ -2,9 +2,9 @@ type, public :: _NAME
     private
     _ELEM_TYPE :: val
     _ELEM_TYPE, allocatable :: grad(:)
-#if defined(_GRADGRAD)
+#if _DERIV_ID == _GRADGRAD
     _ELEM_TYPE, allocatable :: gradgrad(:)
-#elif defined(_DIVGRAD)
+#elif _DERIV_ID == _DIVGRAD
     _ELEM_TYPE :: divgrad
 #endif
 contains
@@ -14,12 +14,12 @@ contains
 #define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
     _PROC(get_grad)
 #undef _PROC
-#if defined(_GRADGRAD)
+#if _DERIV_ID == _GRADGRAD
 #  define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
     _PROC(get_gradgrad)
 #  undef _PROC
 #endif
-#if defined(_GRADGRAD) || defined(_DIVGRAD)
+#if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
 #  define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
     _PROC(get_divgrad)
 #  undef _PROC
