@@ -50,7 +50,7 @@ program kinds
         prev_kind = curr_kind
     end do
 
-    print *, 'IK=', kind(0)
-    print *, 'RK=', kind(0.)
-    print *, 'CK=', kind((0, 0))
+    print *, 'IK =', kind(0)
+    print *, 'RK =', kind(0.)
+    print *, 'CK =', kind((0, 0))
 end program kinds
