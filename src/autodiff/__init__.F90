@@ -114,7 +114,8 @@ module autodiff
 #undef _DERIV_IDS
 
 #define _PROC _TYPES_BINARY_OP(_OP_NAME)
-#define _FILE "mod_procs_decl.inc"
+#define _FILE "check.inc"
+#define _SUBFILE "mod_proc_decl.inc"
 
 #define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
@@ -137,6 +138,7 @@ module autodiff
 
 #undef _PROC
 #undef _FILE
+#undef _SUBFILE
 
 contains
 
@@ -148,7 +150,8 @@ contains
 #undef _DERIV_IDS
 #undef _FILE
 
-#define _FILE "procs.inc"
+#define _FILE "check.inc"
+#define _SUBFILE "procs.inc"
 #define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
@@ -159,5 +162,6 @@ contains
 #undef _TYPE_IDS1
 #undef _TYPE_IDS2
 #undef _FILE
+#undef _SUBFILE
 
 end module autodiff
