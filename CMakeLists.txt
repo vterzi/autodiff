@@ -11,6 +11,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_Fortran_MODULE_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 
+set(
+    EXCL
+    "K1;K2;K16;HP;XDP;QP"
+    CACHE
+    STRING
+    "Semicolon-separated list of excluded kinds"
+)
 include(cmake/kinds.cmake)
 
 add_subdirectory(src)
