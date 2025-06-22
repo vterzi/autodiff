@@ -44,46 +44,46 @@
 
 
 #define _PROC _TYPES_BINARY_OP(assign)
-elemental subroutine _PROC(this, that)
-    _ARG_TYPE1, intent(inout) :: this
-    _ARG_TYPE2, intent(in) :: that
+elemental subroutine _PROC(arg1, arg2)
+    _ARG_TYPE1, intent(inout) :: arg1
+    _ARG_TYPE2, intent(in) :: arg2
 
 #if _DERIV_ID1 == _GRADGRAD
     integer :: n
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
-    this%val = _CONV1(that)
-    if (allocated(this%grad)) deallocate(this%grad)
-    allocate(this%grad(0))
+    arg1%val = _CONV1(arg2)
+    if (allocated(arg1%grad)) deallocate(arg1%grad)
+    allocate(arg1%grad(0))
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    this = _CONV1(that%val)
+    arg1 = _CONV1(arg2%val)
 #else
-    this%val = _CONV1(that%val)
-    this%grad = _CONV1(that%grad)
+    arg1%val = _CONV1(arg2%val)
+    arg1%grad = _CONV1(arg2%grad)
 #endif
 #if (_DERIV_ID1 == _GRADGRAD) && (_DERIV_ID2 == _GRADGRAD)
-    this%gradgrad = _CONV1(that%gradgrad)
+    arg1%gradgrad = _CONV1(arg2%gradgrad)
 #elif (_DERIV_ID1 == _DIVGRAD) && (_DERIV_ID2 == _DIVGRAD)
-    this%divgrad = _CONV1(that%divgrad)
+    arg1%divgrad = _CONV1(arg2%divgrad)
 #elif (_DERIV_ID1 == _DIVGRAD) && (_DERIV_ID2 == _GRADGRAD)
-    this%divgrad = _CONV1(that%get_divgrad())
+    arg1%divgrad = _CONV1(arg2%get_divgrad())
 #elif _DERIV_ID1 == _GRADGRAD
-    if (allocated(this%gradgrad)) deallocate(this%gradgrad)
-    n = size(this%grad)
-    allocate(this%gradgrad(n * (n + 1) / 2))
-    this%gradgrad = 0
+    if (allocated(arg1%gradgrad)) deallocate(arg1%gradgrad)
+    n = size(arg1%grad)
+    allocate(arg1%gradgrad(n * (n + 1) / 2))
+    arg1%gradgrad = 0
 #elif _DERIV_ID1 == _DIVGRAD
-    this%divgrad = 0
+    arg1%divgrad = 0
 #endif
 end subroutine _PROC
 #undef _PROC
 
 
 #define _PROC _TYPES_BINARY_OP(add)
-elemental function _PROC(this, that) result(res)
-    _ARG_TYPE1, intent(in) :: this
-    _ARG_TYPE2, intent(in) :: that
+elemental function _PROC(arg1, arg2) result(res)
+    _ARG_TYPE1, intent(in) :: arg1
+    _ARG_TYPE2, intent(in) :: arg2
     _RES_TYPE :: res
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 != _VAL)
@@ -91,14 +91,14 @@ elemental function _PROC(this, that) result(res)
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
-    res = this
-    res%val = res%val + _CONV0(that)
+    res = arg1
+    res%val = res%val + _CONV0(arg2)
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    res = that
-    res%val = _CONV0(this) + res%val
+    res = arg2
+    res%val = _CONV0(arg1) + res%val
 #else
-    res = this
-    temp = that
+    res = arg1
+    temp = arg2
     res = res + temp
 #endif
 end function _PROC
@@ -106,9 +106,9 @@ end function _PROC
 
 
 #define _PROC _TYPES_BINARY_OP(sub)
-elemental function _PROC(this, that) result(res)
-    _ARG_TYPE1, intent(in) :: this
-    _ARG_TYPE2, intent(in) :: that
+elemental function _PROC(arg1, arg2) result(res)
+    _ARG_TYPE1, intent(in) :: arg1
+    _ARG_TYPE2, intent(in) :: arg2
     _RES_TYPE :: res
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 != _VAL)
@@ -116,14 +116,14 @@ elemental function _PROC(this, that) result(res)
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
-    res = this
-    res%val = res%val - _CONV0(that)
+    res = arg1
+    res%val = res%val - _CONV0(arg2)
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    res = that
-    res%val = _CONV0(this) - res%val
+    res = arg2
+    res%val = _CONV0(arg1) - res%val
 #else
-    res = this
-    temp = that
+    res = arg1
+    temp = arg2
     res = res - temp
 #endif
 end function _PROC
@@ -131,9 +131,9 @@ end function _PROC
 
 
 #define _PROC _TYPES_BINARY_OP(mul)
-elemental function _PROC(this, that) result(res)
-    _ARG_TYPE1, intent(in) :: this
-    _ARG_TYPE2, intent(in) :: that
+elemental function _PROC(arg1, arg2) result(res)
+    _ARG_TYPE1, intent(in) :: arg1
+    _ARG_TYPE2, intent(in) :: arg2
     _RES_TYPE :: res
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 != _VAL)
@@ -143,8 +143,8 @@ elemental function _PROC(this, that) result(res)
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
-    res = this
-    temp = _CONV0(that)
+    res = arg1
+    temp = _CONV0(arg2)
     res%val = res%val * temp
     res%grad = res%grad * temp
 #  if _DERIV_ID0 == _GRADGRAD
@@ -153,8 +153,8 @@ elemental function _PROC(this, that) result(res)
     res%divgrad = res%divgrad * temp
 #  endif
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    temp = _CONV0(this)
-    res = that
+    temp = _CONV0(arg1)
+    res = arg2
     res%val = temp * res%val
     res%grad = temp * res%grad
 #  if _DERIV_ID0 == _GRADGRAD
@@ -163,8 +163,8 @@ elemental function _PROC(this, that) result(res)
     res%divgrad = temp * res%divgrad
 #  endif
 #else
-    res = this
-    temp = that
+    res = arg1
+    temp = arg2
     res = res * temp
 #endif
 end function _PROC
