@@ -16,15 +16,19 @@
 #define _ELEM_TYPE _TYPE(_KIND)
 #define _ELEM_TYPE1 _TYPE1(_KIND1)
 #define _ELEM_TYPE2 _TYPE2(_KIND2)
+#define _ELEM_TYPE0 _TYPE0(_KIND0)
 #define _CONV(X) _TYPE_CONV(X, kind=_KIND)
 #define _CONV1(X) _TYPE_CONV1(X, kind=_KIND1)
 #define _CONV2(X) _TYPE_CONV2(X, kind=_KIND2)
+#define _CONV0(X) _TYPE_CONV0(X, kind=_KIND0)
 #define _LABEL _CAT(_TYPE_LABEL,_KIND_LABEL)
 #define _LABEL1 _CAT(_TYPE_LABEL1,_KIND_LABEL1)
 #define _LABEL2 _CAT(_TYPE_LABEL2,_KIND_LABEL2)
+#define _LABEL0 _CAT(_TYPE_LABEL0,_KIND_LABEL0)
 #define _NAME _CAT(_DERIV,_LABEL)
 #define _NAME1 _CAT(_DERIV1,_LABEL1)
 #define _NAME2 _CAT(_DERIV2,_LABEL2)
+#define _NAME0 _CAT(_DERIV0,_LABEL0)
 #define _TYPE_UNARY_OP(X) _CAT3(X,_,_NAME)
 #define _TYPE_BINARY_OP(X) _CAT5(_NAME,_,X,_,_NAME)
 #define _LT_TYPE_BINARY_OP(X) _CAT5(_NAME1,_,X,_,_LABEL2)
@@ -113,32 +117,38 @@ module autodiff
 
 #undef _DERIV_IDS
 
-#define _PROC _TYPES_BINARY_OP(_OP_NAME)
-#define _FILE "check.inc"
-#define _SUBFILE "mod_proc_decl.inc"
-
 #define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 
+#define _PROC _TYPES_BINARY_OP(_OP_NAME)
+#define _FILE "check.inc"
+#define _SUBFILE "mod_proc_decl.inc"
 #define _OP assignment(=)
 #define _OP_NAME assign
-    public :: _OP
-    interface _OP
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "derivs.inc"
-#undef _TYPE_IDS1
-#undef _TYPE_IDS2
-    end interface _OP
-#undef _OP
-#undef _OP_NAME
-
-#undef _DERIV_IDS1
-#undef _DERIV_IDS2
-
+#include "ifaces.inc"
+#define _OP operator(+)
+#define _OP_NAME add
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#include "ifaces.inc"
+#define _OP operator(-)
+#define _OP_NAME sub
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#include "ifaces.inc"
+#define _OP operator(*)
+#define _OP_NAME mul
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#include "ifaces.inc"
 #undef _PROC
 #undef _FILE
 #undef _SUBFILE
+
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
 
 contains
 
