@@ -38,6 +38,8 @@ module autodiff
 
     private
 
+#define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
+
 #define _FILE "type.inc"
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
@@ -109,8 +111,13 @@ module autodiff
 #undef _PROC
 #undef _FILE
 
+#undef _DERIV_IDS
+
 #define _PROC _TYPES_BINARY_OP(_OP_NAME)
 #define _FILE "mod_procs_decl.inc"
+
+#define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
+#define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 
 #define _OP assignment(=)
 #define _OP_NAME assign
@@ -125,21 +132,30 @@ module autodiff
 #undef _OP
 #undef _OP_NAME
 
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
+
 #undef _PROC
 #undef _FILE
 
 contains
 
 #define _FILE "proc.inc"
+#define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
 #undef _TYPE_IDS
+#undef _DERIV_IDS
 #undef _FILE
 
 #define _FILE "procs.inc"
+#define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
+#define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
 #undef _TYPE_IDS1
 #undef _TYPE_IDS2
 #undef _FILE
