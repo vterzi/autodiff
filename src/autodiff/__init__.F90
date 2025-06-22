@@ -36,8 +36,6 @@
 #define _TYPES_BINARY_OP(X) _CAT5(_NAME1,_,X,_,_NAME2)
 
 module autodiff
-    use, intrinsic :: ieee_arithmetic, only: ieee_value, IEEE_QUIET_NAN
-
     implicit none
 
     private

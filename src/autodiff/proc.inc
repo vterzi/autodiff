@@ -434,18 +434,12 @@ elemental function _PROC(this) result(res)
         res = -this
     else
         res%val = this%val
-#  if _TYPE_ID == _REAL
-#    define _NAN ieee_value(res%val, IEEE_QUIET_NAN)
-#  else
-#    define _NAN 0 / res%val
-#  endif
-        res%grad = _NAN
+        res%grad = 0 / res%val
 #  if _DERIV_ID == _GRADGRAD
-        res%gradgrad = _NAN
+        res%gradgrad = 0 / res%val
 #  elif _DERIV_ID == _DIVGRAD
-        res%divgrad = _NAN
+        res%divgrad = 0 / res%val
 #  endif
-#  undef _NAN
     end if
 #endif
 end function _PROC
