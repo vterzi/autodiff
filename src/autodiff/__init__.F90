@@ -15,7 +15,7 @@
 
 #define _ELEM_TYPE _TYPE(_KIND)
 #define _ELEM_TYPE1 _TYPE1(_KIND1)
-#define _ELEM_TYPE2 _TYPE1(_KIND2)
+#define _ELEM_TYPE2 _TYPE2(_KIND2)
 #define _CONV(X) _TYPE_CONV(X, kind=_KIND)
 #define _CONV1(X) _TYPE_CONV1(X, kind=_KIND1)
 #define _CONV2(X) _TYPE_CONV2(X, kind=_KIND2)
