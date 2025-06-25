@@ -268,33 +268,12 @@ end function _PROC
 #undef _PROC
 
 
-#if _TYPE_ID == _INTEGER
-#  define _PROC _TYPE_BINARY_OP(div)
+#define _PROC _TYPE_BINARY_OP(div)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
 
-    res = real(this) / real(that)
-end function _PROC
-#  undef _PROC
-
-
-#  define _PROC _TYPE_BINARY_OP(pow)
-elemental function _PROC(this, that) result(res)
-    class(_NAME), intent(in) :: this, that
-    type(_NAME) :: res
-
-    res = real(this)**real(that)
-end function _PROC
-#  undef _PROC
-
-#elif (_TYPE_ID == _REAL) || (_TYPE_ID == _COMPLEX)
-
-#  define _PROC _TYPE_BINARY_OP(div)
-elemental function _PROC(this, that) result(res)
-    class(_NAME), intent(in) :: this, that
-    type(_NAME) :: res
-
+#if _TYPE_ID != _INTEGER
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
     _ELEM_TYPE :: two_val
@@ -329,15 +308,19 @@ elemental function _PROC(this, that) result(res)
         - res%val * that%divgrad &
     )
 #  endif
+#else
+    res = real(this) / real(that)
+#endif
 end function _PROC
-#  undef _PROC
+#undef _PROC
 
 
-#  define _PROC _TYPE_BINARY_OP(pow)
+#define _PROC _TYPE_BINARY_OP(pow)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
     type(_NAME) :: res
 
+#if _TYPE_ID != _INTEGER
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
@@ -385,9 +368,11 @@ elemental function _PROC(this, that) result(res)
         + log_val * that%divgrad &
     )
 #  endif
-end function _PROC
-#  undef _PROC
+#else
+    res = real(this)**real(that)
 #endif
+end function _PROC
+#undef _PROC
 
 ! -----------------------------------------------------------------------------
 
