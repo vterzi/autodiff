@@ -171,6 +171,69 @@ end function _PROC
 #undef _PROC
 
 
+#define _PROC _TYPES_BINARY_OP(div)
+elemental function _PROC(arg1, arg2) result(res)
+    _ARG_TYPE1, intent(in) :: arg1
+    _ARG_TYPE2, intent(in) :: arg2
+    _RES_TYPE :: res
+
+#if (_TYPE_ID1 != _INTEGER) || (_TYPE_ID2 != _INTEGER)
+#  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 != _VAL)
+    _RES_TYPE :: temp
+#  else
+#    if _DERIV_ID2 == _GRADGRAD
+    integer :: i, lo, up
+    _ELEM_TYPE0 :: factor2
+#    endif
+#    if _DERIV_ID2 != _VAL
+    _ELEM_TYPE0 :: factor1
+#    endif
+    _ELEM_TYPE0 :: inv_val
+#  endif
+
+#  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
+    inv_val = 1 / _CONV0(arg2)
+    res%val = arg1%val * inv_val
+    res%grad = arg1%grad * inv_val
+#    if _DERIV_ID0 == _GRADGRAD
+    res%gradgrad = arg1%gradgrad * inv_val
+#    elif _DERIV_ID0 == _DIVGRAD
+    res%divgrad = arg1%divgrad * inv_val
+#    endif
+#  elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
+    inv_val = 1 / _CONV0(arg2%val)
+    res%val = arg1 * inv_val
+    factor1 = -inv_val * res%val
+    res%grad = factor1 * arg2%grad
+#    if _DERIV_ID2 == _GRADGRAD
+    factor2 = -2 * inv_val * factor1
+    allocate(res%gradgrad(size(arg2%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * arg2%gradgrad(lo:up) &
+            + factor2 * arg2%grad(i) * arg2%grad(:i) &
+        )
+    end do
+#    elif _DERIV_ID2 == _DIVGRAD
+    res%divgrad = factor1 * ( &
+        arg2%divgrad - 2 * inv_val * dot_product(arg2%grad, arg2%grad) &
+    )
+#    endif
+#  else
+    res = arg1
+    temp = arg2
+    res = res / temp
+#  endif
+#else
+    res = real(arg1) / real(arg2)
+#endif
+end function _PROC
+#undef _PROC
+
+
 #undef _DERIV_ID0
 #undef _DERIV0
 #undef _TYPE_ID0
