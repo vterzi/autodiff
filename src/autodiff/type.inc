@@ -45,14 +45,12 @@ contains
 #define _PROC _TYPE_BINARY_OP(mul)
 #define _OP operator(*)
 #include "type_generic.inc"
-#if (_TYPE_ID == _REAL) || (_TYPE_ID == _COMPLEX)
-#  define _PROC _TYPE_BINARY_OP(div)
-#  define _OP operator(/)
-#  include "type_generic.inc"
-#  define _PROC _TYPE_BINARY_OP(pow)
-#  define _OP operator(**)
-#  include "type_generic.inc"
-#endif
+#define _PROC _TYPE_BINARY_OP(div)
+#define _OP operator(/)
+#include "type_generic.inc"
+#define _PROC _TYPE_BINARY_OP(pow)
+#define _OP operator(**)
+#include "type_generic.inc"
 end type _NAME
 
 interface _NAME

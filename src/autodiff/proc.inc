@@ -268,7 +268,28 @@ end function _PROC
 #undef _PROC
 
 
-#if (_TYPE_ID == _REAL) || (_TYPE_ID == _COMPLEX)
+#if _TYPE_ID == _INTEGER
+#  define _PROC _TYPE_BINARY_OP(div)
+elemental function _PROC(this, that) result(res)
+    class(_NAME), intent(in) :: this, that
+    type(_NAME) :: res
+
+    res = real(this) / real(that)
+end function _PROC
+#  undef _PROC
+
+
+#  define _PROC _TYPE_BINARY_OP(pow)
+elemental function _PROC(this, that) result(res)
+    class(_NAME), intent(in) :: this, that
+    type(_NAME) :: res
+
+    res = real(this)**real(that)
+end function _PROC
+#  undef _PROC
+
+#elif (_TYPE_ID == _REAL) || (_TYPE_ID == _COMPLEX)
+
 #  define _PROC _TYPE_BINARY_OP(div)
 elemental function _PROC(this, that) result(res)
     class(_NAME), intent(in) :: this, that
