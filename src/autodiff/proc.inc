@@ -370,6 +370,16 @@ end function _PROC
 
 ! -----------------------------------------------------------------------------
 
+#define _PROC _TYPE_UNARY_OP(kind)
+elemental function _PROC(this) result(res)
+    class(_NAME), intent(in) :: this
+    integer :: res
+
+    res = kind(this%val)
+end function _PROC
+#undef _PROC
+
+
 #if _TYPE_ID == _COMPLEX
 #  define _PROC _TYPE_UNARY_OP(real)
 elemental function _PROC(this) result(res)

@@ -50,6 +50,9 @@ module autodiff
 
 #define _PROC _TYPE_UNARY_OP(_OP)
 #define _FILE "mod_proc_decl.inc"
+#define _OP kind
+#define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
+#include "iface.inc"
 #define _OP real
 #define _TYPE_IDS (_COMPLEX)
 #include "iface.inc"
