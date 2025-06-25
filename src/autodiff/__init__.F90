@@ -55,6 +55,7 @@ module autodiff
 #include "iface.inc"
 #define _OP real
 #define _TYPE_IDS (_COMPLEX)
+#define _NO_PUBLIC
 #include "iface.inc"
 #define _OP aimag
 #define _TYPE_IDS (_COMPLEX)
@@ -118,6 +119,27 @@ module autodiff
 
 #undef _DERIV_IDS
 
+
+#define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _DERIV_IDS2 (_VAL)
+
+#define _FILE "mod_proc_decl.inc"
+#define _PROC _CAT4(_OP,_KIND_LABEL2,_,_NAME1)
+#define _OP int
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER)
+#include "ifaces.inc"
+#define _OP real
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_REAL)
+#include "ifaces.inc"
+#undef _FILE
+#undef _PROC
+
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
+
+
 #define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 
@@ -159,6 +181,18 @@ contains
 #include "derivs.inc"
 #undef _TYPE_IDS
 #undef _DERIV_IDS
+#undef _FILE
+
+#define _FILE "conv.inc"
+#define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _DERIV_IDS2 (_VAL)
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL)
+#include "derivs.inc"
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _TYPE_IDS2
 #undef _FILE
 
 #define _FILE "check.inc"
