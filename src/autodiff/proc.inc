@@ -274,38 +274,33 @@ elemental function _PROC(x, y) result(r)
     type(_NAME) :: r
 
 #if _TYPE_ID != _INTEGER
+    _ELEM_TYPE :: factor1, factor2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
-    _ELEM_TYPE :: two_val
 #  endif
-    _ELEM_TYPE :: inv_val
 
-    inv_val = 1 / y%val
-    r%val = x%val * inv_val
-    r%grad = (x%grad - r%val * y%grad) * inv_val
+    factor1 = 1 / y%val
+    r%val = x%val * factor1
+    factor2 = factor1 * r%val
+    r%grad = factor1 * x%grad - factor2 * y%grad
 #  if _DERIV_ID == _GRADGRAD
-    two_val = 2 * r%val
     allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
         lo = up + i
         up = up + 1
-        r%gradgrad(lo:up) = inv_val * ( &
-            x%gradgrad(lo:up) &
-            + inv_val * ( &
-                (two_val * y%grad(i) - x%grad(i)) * y%grad(:i) &
-                - x%grad(:i) * y%grad(i) &
-            ) &
-            - r%val * y%gradgrad(lo:up) &
+        r%gradgrad(lo:up) = ( &
+            factor1 * x%gradgrad(lo:up) &
+            - factor1 * y%grad(i) * r%grad(:i) &
+            - factor1 * r%grad(i) * y%grad(:i) &
+            - factor2 * y%gradgrad(lo:up) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = inv_val * ( &
-        x%divgrad &
-        + 2 * inv_val * dot_product( &
-            r%val * y%grad - x%grad, y%grad &
-        ) &
-        - r%val * y%divgrad &
+    r%divgrad = ( &
+        factor1 * x%divgrad &
+        - 2 * factor1 * dot_product(y%grad, r%grad) &
+        - factor2 * y%divgrad &
     )
 #  endif
 #else
@@ -321,51 +316,51 @@ elemental function _PROC(x, y) result(r)
     type(_NAME) :: r
 
 #if _TYPE_ID != _INTEGER
+    _ELEM_TYPE :: factor, factor1, factor2
+#  if _DERIV_ID > _GRAD
+    _ELEM_TYPE :: factor3, factor4
+#  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: inv_val, val_ratio, log_val
-#  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: temp1, temp2, temp3
-#  endif
 
     r%val = x%val**y%val
-    inv_val = 1 / x%val
-    val_ratio = y%val * inv_val
-    log_val = log(x%val)
+    factor = 1 / x%val
+    factor1 = y%val * factor
+    factor2 = log(x%val)
 #  if _DERIV_ID > _GRAD
-    temp1 = val_ratio * (val_ratio - inv_val)
-    temp2 = val_ratio * log_val + inv_val
-    temp3 = log_val**2
+    factor3 = factor1 * (factor1 - factor)
+    factor4 = factor2**2
+    factor = (factor1 * factor2 + factor)
 #  endif
-    val_ratio = val_ratio * r%val
-    log_val = log_val * r%val
-    r%grad = x%grad * val_ratio + log_val * y%grad
+    factor1 = factor1 * r%val
+    factor2 = factor2 * r%val
+    r%grad = factor1 * x%grad + factor2 * y%grad
 #  if _DERIV_ID == _GRADGRAD
-    temp1 = temp1 * r%val
-    temp2 = temp2 * r%val
-    temp3 = temp3 * r%val
+    factor3 = factor3 * r%val
+    factor4 = factor4 * r%val
+    factor = factor * r%val
     allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
         lo = up + i
         up = up + 1
         r%gradgrad(lo:up) = ( &
-            x%gradgrad(lo:up) * val_ratio &
-            + x%grad(:i) * (x%grad(i) * temp1 + temp2 * y%grad(i)) &
-            + (x%grad(i) * temp2 + temp3 * y%grad(i)) * y%grad(:i) &
-            + log_val * y%gradgrad(lo:up) &
+            factor1 * x%gradgrad(lo:up) &
+            + (factor3 * x%grad(i) + factor * y%grad(i)) * x%grad(:i) &
+            + (factor * x%grad(i) + factor4 * y%grad(i)) * y%grad(:i) &
+            + factor2 * y%gradgrad(lo:up) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
     r%divgrad = ( &
-        x%divgrad * val_ratio &
+        factor1 * x%divgrad &
         + r%val * ( &
-            temp1 * dot_product(x%grad, x%grad) &
-            + 2 * temp2 * dot_product(x%grad, y%grad) &
-            + temp3 * dot_product(y%grad, y%grad) &
+            factor3 * dot_product(x%grad, x%grad) &
+            + 2 * factor * dot_product(x%grad, y%grad) &
+            + factor4 * dot_product(y%grad, y%grad) &
         ) &
-        + log_val * y%divgrad &
+        + factor2 * y%divgrad &
     )
 #  endif
 #else
