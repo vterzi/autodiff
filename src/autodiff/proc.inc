@@ -462,25 +462,25 @@ end function _PROC
 #undef _PROC
 
 
-#if (_TYPE_ID == _REAL) || (_TYPE_ID == _COMPLEX)
+#if _TYPE_ID != _INTEGER
 #  define _PROC _TYPE_UNARY_OP(sqrt)
 elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
-#  if _DERIV_ID == _GRADGRAD
-    integer :: i, lo, up
-#  endif
     _ELEM_TYPE :: factor1
 #  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
+#  endif
+#  if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up
 #  endif
 
     res%val = sqrt(this%val)
     factor1 = 1 / (2 * res%val)
     res%grad = factor1 * this%grad
 #  if _DERIV_ID > _GRAD
-    factor2 = -factor1 / (2 * this%val)
+    factor2 = -2 * factor1**2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
@@ -490,12 +490,12 @@ elemental function _PROC(this) result(res)
         up = up + 1
         res%gradgrad(lo:up) = ( &
             factor1 * this%gradgrad(lo:up) &
-            + factor2 * this%grad(i) * this%grad(:i) &
+            + factor2 * res%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
     res%divgrad = ( &
-        factor1 * this%divgrad + factor2 * dot_product(this%grad, this%grad) &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -519,12 +519,12 @@ elemental function _PROC(this) result(res)
     do i = 1, size(res%grad)
         lo = up + i
         up = up + 1
-        res%gradgrad(lo:up) = res%val * ( &
-            this%gradgrad(lo:up) + this%grad(i) * this%grad(:i) &
+        res%gradgrad(lo:up) = ( &
+            res%val * this%gradgrad(lo:up) + res%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    res%divgrad = res%val * (this%divgrad + dot_product(this%grad, this%grad))
+    res%divgrad = res%val * this%divgrad + dot_product(res%grad, this%grad)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -535,14 +535,14 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: inv_val
 
     res%val = log(this%val)
-    inv_val = 1 / this%val
-    res%grad = inv_val * this%grad
+    factor = 1 / this%val
+    res%grad = factor * this%grad
 #  if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
@@ -550,11 +550,11 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            inv_val * this%gradgrad(lo:up) - res%grad(i) * res%grad(:i) &
+            factor * this%gradgrad(lo:up) - res%grad(i) * res%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    res%divgrad = inv_val * this%divgrad - dot_product(res%grad, res%grad)
+    res%divgrad = factor * this%divgrad - dot_product(res%grad, res%grad)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -566,15 +566,15 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE, parameter :: LOG_10 = log(_CONV(10))
+    _ELEM_TYPE :: factor
 #    if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #    endif
-    _ELEM_TYPE :: log_10, inv_val
 
     res%val = log10(this%val)
-    log_10 = log(real(10, _KIND))
-    inv_val = 1 / (this%val * log_10)
-    res%grad = inv_val * this%grad
+    factor = 1 / (this%val * LOG_10)
+    res%grad = factor * this%grad
 #    if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
@@ -582,13 +582,13 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            inv_val * this%gradgrad(lo:up) &
-            - log_10 * res%grad(i) * res%grad(:i) &
+            factor * this%gradgrad(lo:up) &
+            - LOG_10 * res%grad(i) * res%grad(:i) &
         )
     end do
 #    elif _DERIV_ID == _DIVGRAD
     res%divgrad = ( &
-        inv_val * this%divgrad - log_10 * dot_product(res%grad, res%grad) &
+        factor * this%divgrad - LOG_10 * dot_product(res%grad, res%grad) &
     )
 #    endif
 end function _PROC
@@ -601,14 +601,14 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: cos_val
 
     res%val = sin(this%val)
-    cos_val = cos(this%val)
-    res%grad = cos_val * this%grad
+    factor = cos(this%val)
+    res%grad = factor * this%grad
 #  if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
@@ -616,13 +616,13 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            cos_val * this%gradgrad(lo:up) &
+            factor * this%gradgrad(lo:up) &
             - res%val * this%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
     res%divgrad = ( &
-        cos_val * this%divgrad - res%val * dot_product(this%grad, this%grad) &
+        factor * this%divgrad - res%val * dot_product(this%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -634,14 +634,14 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: sin_val
 
     res%val = cos(this%val)
-    sin_val = -sin(this%val)
-    res%grad = sin_val * this%grad
+    factor = -sin(this%val)
+    res%grad = factor * this%grad
 #  if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
@@ -649,13 +649,13 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            sin_val * this%gradgrad(lo:up) &
+            factor * this%gradgrad(lo:up) &
             - res%val * this%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
     res%divgrad = ( &
-        sin_val * this%divgrad - res%val * dot_product(this%grad, this%grad) &
+        factor * this%divgrad - res%val * dot_product(this%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -667,29 +667,34 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor1
+#  if _DERIV_ID > _GRAD
+    _ELEM_TYPE :: factor2
+#  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
-    _ELEM_TYPE :: two_val
 #  endif
-    _ELEM_TYPE :: factor
 
     res%val = tan(this%val)
-    factor = 1 + res%val**2
-    res%grad = factor * this%grad
+    factor1 = 1 + res%val**2
+    res%grad = factor1 * this%grad
+#  if _DERIV_ID > _GRAD
+    factor2 = 2 * res%val
+#  endif
 #  if _DERIV_ID == _GRADGRAD
-    two_val = 2 * res%val
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
         up = up + 1
-        res%gradgrad(lo:up) = factor * ( &
-            this%gradgrad(lo:up) + two_val * this%grad(i) * this%grad(:i) &
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    res%divgrad = factor * ( &
-        this%divgrad + 2 * res%val * dot_product(this%grad, this%grad) &
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -701,10 +706,10 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor1, factor2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: factor1, factor2
 
     res%val = asin(this%val)
     factor2 = 1 / (1 - this%val**2)
@@ -738,10 +743,10 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor1, factor2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: factor1, factor2
 
     res%val = acos(this%val)
     factor2 = 1 / (1 - this%val**2)
@@ -775,17 +780,21 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
-#  if _DERIV_ID == _GRADGRAD
-    integer :: i, lo, up
+    _ELEM_TYPE :: factor1
+#  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
 #  endif
-    _ELEM_TYPE :: factor1
+#  if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up
+#  endif
 
     res%val = atan(this%val)
     factor1 = 1 / (1 + this%val**2)
     res%grad = factor1 * this%grad
+#  if _DERIV_ID > _GRAD
+    factor2 = -2 * this%val
+#  endif
 #  if _DERIV_ID == _GRADGRAD
-    factor2 = -2 * factor1 * this%val
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
     do i = 1, size(res%grad)
@@ -793,12 +802,12 @@ elemental function _PROC(this) result(res)
         up = up + 1
         res%gradgrad(lo:up) = ( &
             factor1 * this%gradgrad(lo:up) &
-            + factor2 * res%grad(i) * this%grad(:i) &
+            + factor2 * res%grad(i) * res%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    res%divgrad = factor1 * ( &
-        this%divgrad - 2 * this%val * dot_product(res%grad, this%grad) &
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, res%grad) &
     )
 #  endif
 end function _PROC
@@ -810,14 +819,14 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: cosh_val
 
     res%val = sinh(this%val)
-    cosh_val = cosh(this%val)
-    res%grad = cosh_val * this%grad
+    factor = cosh(this%val)
+    res%grad = factor * this%grad
 #  if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
@@ -825,13 +834,13 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            cosh_val * this%gradgrad(lo:up) &
+            factor * this%gradgrad(lo:up) &
             + res%val * this%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
     res%divgrad = ( &
-        cosh_val * this%divgrad + res%val * dot_product(this%grad, this%grad) &
+        factor * this%divgrad + res%val * dot_product(this%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -843,14 +852,14 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: sinh_val
 
     res%val = cosh(this%val)
-    sinh_val = sinh(this%val)
-    res%grad = sinh_val * this%grad
+    factor = sinh(this%val)
+    res%grad = factor * this%grad
 #  if _DERIV_ID == _GRADGRAD
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
@@ -858,13 +867,13 @@ elemental function _PROC(this) result(res)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            sinh_val * this%gradgrad(lo:up) &
+            factor * this%gradgrad(lo:up) &
             + res%val * this%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
     res%divgrad = ( &
-        sinh_val * this%divgrad + res%val * dot_product(this%grad, this%grad) &
+        factor * this%divgrad + res%val * dot_product(this%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -876,29 +885,34 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor1
+#  if _DERIV_ID > _GRAD
+    _ELEM_TYPE :: factor2
+#  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
-    _ELEM_TYPE :: two_val
 #  endif
-    _ELEM_TYPE :: factor
 
     res%val = tanh(this%val)
-    factor = 1 - res%val**2
-    res%grad = factor * this%grad
+    factor1 = 1 - res%val**2
+    res%grad = factor1 * this%grad
+#  if _DERIV_ID > _GRAD
+    factor2 = -2 * res%val
+#  endif
 #  if _DERIV_ID == _GRADGRAD
-    two_val = 2 * res%val
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
         up = up + 1
-        res%gradgrad(lo:up) = -factor * ( &
-            this%gradgrad(lo:up) + two_val * this%grad(i) * this%grad(:i) &
+        res%gradgrad(lo:up) = ( &
+            factor1 * this%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * this%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    res%divgrad = -factor * ( &
-        this%divgrad + 2 * res%val * dot_product(this%grad, this%grad) &
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, this%grad) &
     )
 #  endif
 end function _PROC
@@ -910,10 +924,10 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor1, factor2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: factor1, factor2
 
     res%val = asinh(this%val)
     factor2 = 1 / (1 + this%val**2)
@@ -947,10 +961,10 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
+    _ELEM_TYPE :: factor1, factor2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
-    _ELEM_TYPE :: factor1, factor2
 
     res%val = acosh(this%val)
     factor2 = -1 / (1 - this%val**2)
@@ -984,17 +998,21 @@ elemental function _PROC(this) result(res)
     class(_NAME), intent(in) :: this
     type(_NAME) :: res
 
-#  if _DERIV_ID == _GRADGRAD
-    integer :: i, lo, up
+    _ELEM_TYPE :: factor1
+#  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
 #  endif
-    _ELEM_TYPE :: factor1
+#  if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up
+#  endif
 
     res%val = atanh(this%val)
     factor1 = 1 / (1 - this%val**2)
     res%grad = factor1 * this%grad
+#  if _DERIV_ID > _GRAD
+    factor2 = 2 * this%val
+#  endif
 #  if _DERIV_ID == _GRADGRAD
-    factor2 = -2 * factor1 * this%val
     allocate(res%gradgrad(size(this%gradgrad)))
     up = 0
     do i = 1, size(res%grad)
@@ -1002,12 +1020,12 @@ elemental function _PROC(this) result(res)
         up = up + 1
         res%gradgrad(lo:up) = ( &
             factor1 * this%gradgrad(lo:up) &
-            + factor2 * res%grad(i) * this%grad(:i) &
+            + factor2 * res%grad(i) * res%grad(:i) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    res%divgrad = factor1 * ( &
-        this%divgrad - 2 * this%val * dot_product(res%grad, this%grad) &
+    res%divgrad = ( &
+        factor1 * this%divgrad + factor2 * dot_product(res%grad, res%grad) &
     )
 #  endif
 end function _PROC
