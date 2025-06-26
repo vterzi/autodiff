@@ -235,6 +235,86 @@ end function _PROC
 #undef _PROC
 
 
+#define _PROC _TYPES_BINARY_OP(pow)
+elemental function _PROC(arg1, arg2) result(res)
+    _ARG_TYPE1, intent(in) :: arg1
+    _ARG_TYPE2, intent(in) :: arg2
+    _RES_TYPE :: res
+
+#if _TYPE_ID0 != _INTEGER
+    _RES_TYPE :: temp
+#  if (_DERIV_ID1 == _VAL) || (_DERIV_ID2 == _VAL)
+    _ELEM_TYPE0 :: val, factor1, factor2
+#    if (_DERIV_ID1 != _VAL)
+    _ELEM_TYPE0 :: inv_val
+#    endif
+#    if _DERIV_ID0 == _GRADGRAD
+    integer :: i, lo, up
+#    endif
+#  endif
+
+#  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
+    temp = arg1
+    val = _CONV0(arg2)
+    res%val = temp%val**val
+    inv_val = 1 / temp%val
+    factor2 = val * inv_val
+    factor1 = factor2 * res%val
+    res%grad = factor1 * temp%grad
+#    if _DERIV_ID0 > _GRAD
+    factor2 = factor2 - inv_val
+#    endif
+#    if _DERIV_ID0 == _GRADGRAD
+    allocate(res%gradgrad(size(temp%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * temp%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * temp%grad(:i) &
+        )
+    end do
+#    elif _DERIV_ID0 == _DIVGRAD
+    res%divgrad = ( &
+        factor1 * temp%divgrad + factor2 * dot_product(res%grad, temp%grad) &
+    )
+#    endif
+#  elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
+    val = _CONV0(arg1)
+    temp = arg2
+    res%val = val**temp%val
+    factor2 = log(val)
+    factor1 = factor2 * res%val
+    res%grad = factor1 * temp%grad
+#    if _DERIV_ID0 == _GRADGRAD
+    allocate(res%gradgrad(size(temp%gradgrad)))
+    up = 0
+    do i = 1, size(res%grad)
+        lo = up + i
+        up = up + 1
+        res%gradgrad(lo:up) = ( &
+            factor1 * temp%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * temp%grad(:i) &
+        )
+    end do
+#    elif _DERIV_ID0 == _DIVGRAD
+    res%divgrad = ( &
+        factor1 * temp%divgrad + factor2 * dot_product(res%grad, temp%grad) &
+    )
+#    endif
+#  else
+    res = arg1
+    temp = arg2
+    res = res**temp
+#  endif
+#else
+    res = real(arg1)**real(arg2)
+#endif
+end function _PROC
+#undef _PROC
+
+
 #undef _DERIV_ID0
 #undef _DERIV0
 #undef _TYPE_ID0

@@ -171,6 +171,11 @@ module autodiff
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
 #include "ifaces.inc"
+#define _OP operator(**)
+#define _OP_NAME div
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#include "ifaces.inc"
 #undef _PROC
 #undef _FILE
 #undef _SUBFILE
