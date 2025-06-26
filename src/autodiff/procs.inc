@@ -136,31 +136,29 @@ elemental function _PROC(arg1, arg2) result(res)
     _ARG_TYPE2, intent(in) :: arg2
     _RES_TYPE :: res
 
-#if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 != _VAL)
-    _RES_TYPE :: temp
+#if (_DERIV_ID1 == _VAL) || (_DERIV_ID2 == _VAL)
+    _ELEM_TYPE0 :: val
 #else
-    _ELEM_TYPE0 :: temp
+    _RES_TYPE :: temp
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
-    res = arg1
-    temp = _CONV0(arg2)
-    res%val = res%val * temp
-    res%grad = res%grad * temp
+    val = _CONV0(arg2)
+    res%val = arg1%val * val
+    res%grad = arg1%grad * val
 #  if _DERIV_ID0 == _GRADGRAD
-    res%gradgrad = res%gradgrad * temp
+    res%gradgrad = arg1%gradgrad * val
 #  elif _DERIV_ID0 == _DIVGRAD
-    res%divgrad = res%divgrad * temp
+    res%divgrad = arg1%divgrad * val
 #  endif
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    temp = _CONV0(arg1)
-    res = arg2
-    res%val = temp * res%val
-    res%grad = temp * res%grad
+    val = _CONV0(arg1)
+    res%val = val * arg2%val
+    res%grad = val * arg2%grad
 #  if _DERIV_ID0 == _GRADGRAD
-    res%gradgrad = temp * res%gradgrad
+    res%gradgrad = val * arg2%gradgrad
 #  elif _DERIV_ID0 == _DIVGRAD
-    res%divgrad = temp * res%divgrad
+    res%divgrad = val * arg2%divgrad
 #  endif
 #else
     res = arg1
@@ -177,18 +175,18 @@ elemental function _PROC(arg1, arg2) result(res)
     _ARG_TYPE2, intent(in) :: arg2
     _RES_TYPE :: res
 
-#if (_TYPE_ID1 != _INTEGER) || (_TYPE_ID2 != _INTEGER)
-#  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 != _VAL)
-    _RES_TYPE :: temp
-#  else
-#    if _DERIV_ID2 == _GRADGRAD
-    integer :: i, lo, up
-    _ELEM_TYPE0 :: factor2
-#    endif
-#    if _DERIV_ID2 != _VAL
-    _ELEM_TYPE0 :: factor1
-#    endif
+#if _TYPE_ID0 != _INTEGER
+#  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
     _ELEM_TYPE0 :: inv_val
+#  endif
+#  if _DERIV_ID2 != _VAL
+    _RES_TYPE :: temp
+#    if _DERIV_ID1 == _VAL
+    _ELEM_TYPE0 :: factor1, factor2
+#      if _DERIV_ID0 == _GRADGRAD
+    integer :: i, lo, up
+#      endif
+#    endif
 #  endif
 
 #  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
@@ -201,25 +199,28 @@ elemental function _PROC(arg1, arg2) result(res)
     res%divgrad = arg1%divgrad * inv_val
 #    endif
 #  elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    inv_val = 1 / _CONV0(arg2%val)
-    res%val = arg1 * inv_val
-    factor1 = -inv_val * res%val
-    res%grad = factor1 * arg2%grad
-#    if _DERIV_ID2 == _GRADGRAD
-    factor2 = -2 * inv_val * factor1
-    allocate(res%gradgrad(size(arg2%gradgrad)))
+    temp = arg2
+    factor2 = 1 / temp%val
+    res%val = arg1 * factor2
+    factor1 = -factor2 * res%val
+    res%grad = factor1 * temp%grad
+#    if _DERIV_ID0 > _GRAD
+    factor2 = -2 * factor2
+#    endif
+#    if _DERIV_ID0 == _GRADGRAD
+    allocate(res%gradgrad(size(temp%gradgrad)))
     up = 0
     do i = 1, size(res%grad)
         lo = up + i
         up = up + 1
         res%gradgrad(lo:up) = ( &
-            factor1 * arg2%gradgrad(lo:up) &
-            + factor2 * arg2%grad(i) * arg2%grad(:i) &
+            factor1 * temp%gradgrad(lo:up) &
+            + factor2 * res%grad(i) * temp%grad(:i) &
         )
     end do
-#    elif _DERIV_ID2 == _DIVGRAD
-    res%divgrad = factor1 * ( &
-        arg2%divgrad - 2 * inv_val * dot_product(arg2%grad, arg2%grad) &
+#    elif _DERIV_ID0 == _DIVGRAD
+    res%divgrad = ( &
+        factor1 * temp%divgrad + factor2 * dot_product(res%grad, temp%grad) &
     )
 #    endif
 #  else
