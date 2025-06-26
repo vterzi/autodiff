@@ -53,6 +53,9 @@ module autodiff
 #define _OP kind
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "iface.inc"
+#define _OP sign
+#define _TYPE_IDS (_INTEGER | _REAL)
+#include "iface.inc"
 #define _OP real
 #define _TYPE_IDS (_COMPLEX)
 #define _NO_PUBLIC
@@ -76,6 +79,15 @@ module autodiff
 #define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP log10
+#define _TYPE_IDS (_REAL)
+#include "iface.inc"
+#define _OP erf
+#define _TYPE_IDS (_REAL)
+#include "iface.inc"
+#define _OP erfc
+#define _TYPE_IDS (_REAL)
+#include "iface.inc"
+#define _OP erfc_scaled
 #define _TYPE_IDS (_REAL)
 #include "iface.inc"
 #define _OP sin
