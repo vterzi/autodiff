@@ -126,6 +126,9 @@ module autodiff
 #define _OP atanh
 #define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
+#define _OP atan2
+#define _TYPE_IDS (_REAL)
+#include "iface.inc"
 #undef _PROC
 #undef _FILE
 

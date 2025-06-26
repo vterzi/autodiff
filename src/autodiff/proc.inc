@@ -1114,3 +1114,54 @@ elemental function _PROC(x) result(r)
 end function _PROC
 #  undef _PROC
 #endif
+
+
+#if _TYPE_ID == _REAL
+#  define _PROC _TYPE_UNARY_OP(atan2)
+elemental function _PROC(y, x) result(r)
+    class(_NAME), intent(in) :: y, x
+    type(_NAME) :: r
+
+    _ELEM_TYPE :: factor, factor1, factor2
+#  if _DERIV_ID > _GRAD
+    _ELEM_TYPE :: factor3, factor4
+#  endif
+#  if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up
+#  endif
+
+    r%val = atan2(y%val, x%val)
+    factor = 1 / (y%val**2 + x%val**2)
+    factor1 = x%val * factor
+    factor2 = y%val * factor
+    r%grad = factor1 * y%grad - factor2 * x%grad
+#  if _DERIV_ID > _GRAD
+    factor3 = 2 * factor1 * factor2
+    factor4 = factor1**2 - factor2**2
+#  endif
+#  if _DERIV_ID == _GRADGRAD
+    allocate(r%gradgrad(size(x%gradgrad)))
+    up = 0
+    do i = 1, size(r%grad)
+        lo = up + i
+        up = up + 1
+        r%gradgrad(lo:up) = ( &
+            factor1 * y%gradgrad(lo:up) &
+            + (factor3 * y%grad(i) + factor4 * x%grad(i)) * y%grad(:i) &
+            + (factor4 * y%grad(i) - factor3 * x%grad(i)) * x%grad(:i) &
+            - factor2 * x%gradgrad(lo:up) &
+        )
+    end do
+#  elif _DERIV_ID == _DIVGRAD
+    r%divgrad = ( &
+        factor1 * y%divgrad &
+        + factor3 * ( &
+            dot_product(y%grad, y%grad) - dot_product(x%grad, x%grad) &
+        ) &
+        + 2 * factor4 * dot_product(y%grad, x%grad) &
+        - factor2 * x%divgrad &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+#endif
