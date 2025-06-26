@@ -607,7 +607,7 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE, parameter :: PI = acos(_CONV(-1.0))
+    _ELEM_TYPE, parameter :: PI = acos(_CONV(-1))
     _ELEM_TYPE :: factor1
 #  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
@@ -644,7 +644,7 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE, parameter :: PI = acos(_CONV(-1.0))
+    _ELEM_TYPE, parameter :: PI = acos(_CONV(-1))
     _ELEM_TYPE :: factor1
 #  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
@@ -681,7 +681,7 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE, parameter :: PI = acos(_CONV(-1.0))
+    _ELEM_TYPE, parameter :: PI = acos(_CONV(-1))
     _ELEM_TYPE :: factor1
 #  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
@@ -1140,7 +1140,7 @@ elemental function _PROC(y, x) result(r)
     factor4 = factor1**2 - factor2**2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gradgrad(min(size(y%gradgrad), size(x%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
         lo = up + i
