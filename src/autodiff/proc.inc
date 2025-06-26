@@ -113,7 +113,7 @@ end function _PROC
 #endif
 
 
-#if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#if _DERIV_ID > _GRAD
 #  define _PROC _TYPE_UNARY_OP(get_divgrad)
 pure function _PROC(this) result(divgrad)
     class(_NAME), intent(in) :: this
@@ -325,7 +325,7 @@ elemental function _PROC(this, that) result(res)
     integer :: i, lo, up
 #  endif
     _ELEM_TYPE :: inv_val, val_ratio, log_val
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: temp1, temp2, temp3
 #  endif
 
@@ -333,7 +333,7 @@ elemental function _PROC(this, that) result(res)
     inv_val = 1 / this%val
     val_ratio = that%val * inv_val
     log_val = log(this%val)
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     temp1 = val_ratio * (val_ratio - inv_val)
     temp2 = val_ratio * log_val + inv_val
     temp3 = log_val**2
@@ -472,14 +472,14 @@ elemental function _PROC(this) result(res)
     integer :: i, lo, up
 #  endif
     _ELEM_TYPE :: factor1
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     _ELEM_TYPE :: factor2
 #  endif
 
     res%val = sqrt(this%val)
     factor1 = 1 / (2 * res%val)
     res%grad = factor1 * this%grad
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     factor2 = -factor1 / (2 * this%val)
 #  endif
 #  if _DERIV_ID == _GRADGRAD
@@ -710,7 +710,7 @@ elemental function _PROC(this) result(res)
     factor2 = 1 / (1 - this%val**2)
     factor1 = sqrt(factor2)
     res%grad = factor1 * this%grad
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     factor2 = factor2 * this%val
 #  endif
 #  if _DERIV_ID == _GRADGRAD
@@ -747,7 +747,7 @@ elemental function _PROC(this) result(res)
     factor2 = 1 / (1 - this%val**2)
     factor1 = -sqrt(factor2)
     res%grad = factor1 * this%grad
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     factor2 = factor2 * this%val
 #  endif
 #  if _DERIV_ID == _GRADGRAD
@@ -919,7 +919,7 @@ elemental function _PROC(this) result(res)
     factor2 = 1 / (1 + this%val**2)
     factor1 = sqrt(factor2)
     res%grad = factor1 * this%grad
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     factor2 = -factor2 * this%val
 #  endif
 #  if _DERIV_ID == _GRADGRAD
@@ -956,7 +956,7 @@ elemental function _PROC(this) result(res)
     factor2 = -1 / (1 - this%val**2)
     factor1 = sqrt(factor2)
     res%grad = factor1 * this%grad
-#  if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
+#  if _DERIV_ID > _GRAD
     factor2 = -factor2 * this%val
 #  endif
 #  if _DERIV_ID == _GRADGRAD
