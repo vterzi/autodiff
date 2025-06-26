@@ -148,6 +148,10 @@ module autodiff
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _TYPE_IDS2 (_REAL)
 #include "ifaces.inc"
+#define _OP cmplx
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _TYPE_IDS2 (_COMPLEX)
+#include "ifaces.inc"
 #undef _FILE
 #undef _PROC
 
@@ -213,6 +217,30 @@ contains
 #define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _TYPE_IDS2 (_INTEGER | _REAL)
+#include "derivs.inc"
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _TYPE_IDS2
+#undef _FILE
+
+#define _FILE "cmplx.inc"
+#define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _DERIV_IDS2 (_VAL)
+#define _TYPE_IDS1 (_COMPLEX)
+#define _TYPE_IDS2 (_COMPLEX)
+#include "derivs.inc"
+#undef _DERIV_IDS1
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _TYPE_IDS2
+#undef _FILE
+
+#define _FILE "cmplx2.inc"
+#define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _DERIV_IDS2 (_VAL)
+#define _TYPE_IDS1 (_INTEGER | _REAL)
+#define _TYPE_IDS2 (_COMPLEX)
 #include "derivs.inc"
 #undef _DERIV_IDS1
 #undef _DERIV_IDS2
