@@ -94,18 +94,18 @@ pure function _PROC(x) result(gradgrad)
     class(_NAME), intent(in) :: x
     _ELEM_TYPE :: gradgrad(size(x%grad), size(x%grad))
 
-    integer :: n, i1, i2, lo, up
+    integer :: n, i, j, lo, up
 
     n = size(x%grad)
     up = 0
-    do i1 = 1, n
+    do i = 1, n
         lo = up + 1
-        up = up + i1
-        gradgrad(:i1, i1) = x%gradgrad(lo:up)
+        up = up + i
+        gradgrad(:i, i) = x%gradgrad(lo:up)
     end do
-    do i1 = 2, n
-        do i2 = 1, i1 - 1
-            gradgrad(i1, i2) = gradgrad(i2, i1)
+    do i = 2, n
+        do j = 1, i - 1
+            gradgrad(i, j) = gradgrad(j, i)
         end do
     end do
 end function _PROC
