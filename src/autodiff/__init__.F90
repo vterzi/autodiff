@@ -185,6 +185,37 @@ module autodiff
 #undef _SUBFILE
 #undef _PROC
 
+
+    public :: operator(//)
+#define _PROC _TYPES_BINARY_OP(_OP_NAME)
+#define _FILE "mod_proc_decl.inc"
+#define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _DERIV_IDS2 (_VAL)
+#define _TYPE_IDS2 (_INTEGER)
+#define _OP operator(//)
+#define _OP_NAME cat
+#define _NO_PUBLIC
+#include "iface.inc"
+#undef _TYPE_IDS2
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _DERIV_IDS1
+#define _DERIV_IDS1 (_VAL)
+#define _TYPE_IDS1 (_INTEGER)
+#define _DERIV_IDS2 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
+#define _OP operator(//)
+#define _OP_NAME cat
+#define _NO_PUBLIC
+#include "iface.inc"
+#undef _TYPE_IDS2
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _DERIV_IDS1
+#undef _FILE
+#undef _PROC
+
 contains
 
 #define _FILE "proc.inc"

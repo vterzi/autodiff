@@ -306,6 +306,108 @@ end function _PROC
 #undef _PROC
 
 
+#if (_DERIV_ID1 | _TYPE_ID1) == (_VAL | _INTEGER)
+#  define _PROC _TYPES_BINARY_OP(cat)
+elemental function _PROC(x, y) result(r)
+    _ARG_TYPE1, intent(in) :: x
+    _ARG_TYPE2, intent(in) :: y
+    type(_NAME2) :: r
+
+    integer :: n, m, j
+#  if _DERIV_ID0 == _GRADGRAD
+    integer :: i, lo, up, lo_, up_
+#  endif
+
+    r%val = y%val
+    n = size(y%grad)
+    m = max(n + x, 0)
+#  if _DERIV_ID0 == _GRADGRAD
+    allocate(r%gradgrad(m * (m + 1) / 2))
+#  endif
+    if (m > n) then
+        j = x
+        allocate(r%grad(m))
+        r%grad(:j) = 0
+        r%grad(j + 1 :) = y%grad
+#  if _DERIV_ID0 == _GRADGRAD
+        up = j * (j + 1) / 2
+        up_ = 0
+        r%gradgrad(:up) = 0
+        do i = 1, n
+            up = up + j
+            lo = up + 1
+            up = up + i
+            lo_ = up_ + 1
+            up_ = up_ + i
+            r%gradgrad(lo - j : lo - 1) = 0
+            r%gradgrad(lo:up) = y%gradgrad(lo_:up_)
+        end do
+#  endif
+    else if (m > 0) then
+        j = -x
+        r%grad = y%grad(j + 1 :)
+#  if _DERIV_ID0 == _GRADGRAD
+        up = j * (j + 1) / 2
+        up_ = 0
+        do i = 1, m
+            up = up + j
+            lo = up + 1
+            up = up + i
+            lo_ = up_ + 1
+            up_ = up_ + i
+            r%gradgrad(lo_:up_) = y%gradgrad(lo:up)
+        end do
+#  endif
+    else
+#  if _DERIV_ID0 == _DIVGRAD
+        r%divgrad = 0
+#  endif
+    end if
+end function _PROC
+#  undef _PROC
+
+#elif (_DERIV_ID2 | _TYPE_ID2) == (_VAL | _INTEGER)
+
+#  define _PROC _TYPES_BINARY_OP(cat)
+elemental function _PROC(x, y) result(r)
+    _ARG_TYPE1, intent(in) :: x
+    _ARG_TYPE2, intent(in) :: y
+    type(_NAME1) :: r
+
+    integer :: n, m
+#  if _DERIV_ID0 == _GRADGRAD
+    integer :: n_, m_
+#  endif
+
+    r%val = x%val
+    n = size(x%grad)
+    m = max(n + y, 0)
+#  if _DERIV_ID0 == _GRADGRAD
+    m_ = m * (m + 1) / 2
+#  endif
+    if (m > n) then
+        allocate(r%grad(m))
+        r%grad(:n) = x%grad
+        r%grad(n + 1 :) = 0
+#  if _DERIV_ID0 == _GRADGRAD
+        allocate(r%gradgrad(m_))
+        n_ = size(x%gradgrad)
+        r%gradgrad(:n_) = x%gradgrad
+        r%gradgrad(n_ + 1 :) = 0
+#  endif
+    else
+        r%grad = x%grad(:m)
+#  if _DERIV_ID0 == _GRADGRAD
+        r%gradgrad = x%gradgrad(:m_)
+#  elif _DERIV_ID0 == _DIVGRAD
+        if (m == 0) r%divgrad = 0
+#  endif
+    end if
+end function _PROC
+#  undef _PROC
+#endif
+
+
 #undef _DERIV_ID0
 #undef _DERIV0
 #undef _TYPE_ID0
