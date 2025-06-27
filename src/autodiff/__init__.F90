@@ -31,8 +31,6 @@
 #define _NAME0 _CAT(_DERIV0,_LABEL0)
 #define _TYPE_UNARY_OP(X) _CAT3(X,_,_NAME)
 #define _TYPE_BINARY_OP(X) _CAT5(_NAME,_,X,_,_NAME)
-#define _LT_TYPE_BINARY_OP(X) _CAT5(_NAME1,_,X,_,_LABEL2)
-#define _RT_TYPE_BINARY_OP(X) _CAT5(_LABEL1,_,X,_,_NAME2)
 #define _TYPES_BINARY_OP(X) _CAT5(_NAME1,_,X,_,_NAME2)
 
 module autodiff
@@ -40,167 +38,152 @@ module autodiff
 
     private
 
-#define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
-
 #define _FILE "type.inc"
+#define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
 #undef _TYPE_IDS
+#undef _DERIV_IDS
 #undef _FILE
+
 
 #define _PROC _TYPE_UNARY_OP(_OP)
 #define _FILE "mod_proc_decl.inc"
-#define _OP kind
-#define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
-#include "iface.inc"
-#define _OP sign
+#define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
+
 #define _TYPE_IDS (_INTEGER | _REAL)
+#define _OP sign
 #include "iface.inc"
-#define _OP real
+#undef _TYPE_IDS
+
 #define _TYPE_IDS (_COMPLEX)
+#define _OP real
 #define _NO_PUBLIC
 #include "iface.inc"
 #define _OP aimag
-#define _TYPE_IDS (_COMPLEX)
 #include "iface.inc"
 #define _OP conjg
-#define _TYPE_IDS (_COMPLEX)
+#include "iface.inc"
+#undef _TYPE_IDS
+
+#define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
+#define _OP kind
 #include "iface.inc"
 #define _OP abs
-#define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #include "iface.inc"
-#define _OP sqrt
+#undef _TYPE_IDS
+
 #define _TYPE_IDS (_REAL | _COMPLEX)
+#define _OP sqrt
 #include "iface.inc"
 #define _OP exp
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP log
-#define _TYPE_IDS (_REAL | _COMPLEX)
-#include "iface.inc"
-#define _OP log10
-#define _TYPE_IDS (_REAL)
-#include "iface.inc"
-#define _OP erf
-#define _TYPE_IDS (_REAL)
-#include "iface.inc"
-#define _OP erfc
-#define _TYPE_IDS (_REAL)
-#include "iface.inc"
-#define _OP erfc_scaled
-#define _TYPE_IDS (_REAL)
 #include "iface.inc"
 #define _OP sin
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP cos
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP tan
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP asin
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP acos
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP atan
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP sinh
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP cosh
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP tanh
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP asinh
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP acosh
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
 #define _OP atanh
-#define _TYPE_IDS (_REAL | _COMPLEX)
 #include "iface.inc"
-#define _OP atan2
+#undef _TYPE_IDS
+
 #define _TYPE_IDS (_REAL)
+#define _OP atan2
 #include "iface.inc"
-#undef _PROC
-#undef _FILE
+#define _OP log10
+#include "iface.inc"
+#define _OP erf
+#include "iface.inc"
+#define _OP erfc
+#include "iface.inc"
+#define _OP erfc_scaled
+#include "iface.inc"
+#undef _TYPE_IDS
 
 #undef _DERIV_IDS
+#undef _FILE
+#undef _PROC
 
 
+#define _PROC _CAT4(_OP,_KIND_LABEL2,_,_NAME1)
+#define _FILE "mod_proc_decl.inc"
 #define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _DERIV_IDS2 (_VAL)
 
-#define _FILE "mod_proc_decl.inc"
-#define _PROC _CAT4(_OP,_KIND_LABEL2,_,_NAME1)
-#define _OP int
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _TYPE_IDS2 (_INTEGER)
-#include "ifaces.inc"
-#define _OP real
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _OP int
+#include "iface.inc"
+#undef _TYPE_IDS2
+
 #define _TYPE_IDS2 (_REAL)
-#include "ifaces.inc"
-#define _OP cmplx
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _OP real
+#include "iface.inc"
+#undef _TYPE_IDS2
+
 #define _TYPE_IDS2 (_COMPLEX)
-#include "ifaces.inc"
+#define _OP cmplx
+#include "iface.inc"
+#undef _TYPE_IDS2
+
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _DERIV_IDS1
 #undef _FILE
 #undef _PROC
 
-#undef _DERIV_IDS1
-#undef _DERIV_IDS2
-
-
-#define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
-#define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 
 #define _PROC _TYPES_BINARY_OP(_OP_NAME)
-#define _FILE "check.inc"
 #define _SUBFILE "mod_proc_decl.inc"
+#define _FILE "check.inc"
+#define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
+#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
+#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
 #define _OP assignment(=)
 #define _OP_NAME assign
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
-#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "ifaces.inc"
+#include "iface.inc"
 #define _OP operator(+)
 #define _OP_NAME add
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
-#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "ifaces.inc"
+#include "iface.inc"
 #define _OP operator(-)
 #define _OP_NAME sub
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
-#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "ifaces.inc"
+#include "iface.inc"
 #define _OP operator(*)
 #define _OP_NAME mul
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
-#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "ifaces.inc"
+#include "iface.inc"
 #define _OP operator(/)
 #define _OP_NAME div
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
-#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "ifaces.inc"
+#include "iface.inc"
 #define _OP operator(**)
 #define _OP_NAME div
-#define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
-#define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
-#include "ifaces.inc"
-#undef _PROC
+#include "iface.inc"
+#undef _TYPE_IDS2
+#undef _DERIV_IDS2
+#undef _TYPE_IDS1
+#undef _DERIV_IDS1
 #undef _FILE
 #undef _SUBFILE
-
-#undef _DERIV_IDS1
-#undef _DERIV_IDS2
+#undef _PROC
 
 contains
 
@@ -214,51 +197,51 @@ contains
 
 #define _FILE "conv.inc"
 #define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
-#define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS2 (_INTEGER | _REAL)
 #include "derivs.inc"
-#undef _DERIV_IDS1
+#undef _TYPE_IDS2
 #undef _DERIV_IDS2
 #undef _TYPE_IDS1
-#undef _TYPE_IDS2
+#undef _DERIV_IDS1
 #undef _FILE
 
 #define _FILE "cmplx.inc"
 #define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
-#define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS1 (_COMPLEX)
+#define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS2 (_COMPLEX)
 #include "derivs.inc"
-#undef _DERIV_IDS1
+#undef _TYPE_IDS2
 #undef _DERIV_IDS2
 #undef _TYPE_IDS1
-#undef _TYPE_IDS2
+#undef _DERIV_IDS1
 #undef _FILE
 
 #define _FILE "cmplx2.inc"
 #define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
-#define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS1 (_INTEGER | _REAL)
+#define _DERIV_IDS2 (_VAL)
 #define _TYPE_IDS2 (_COMPLEX)
 #include "derivs.inc"
-#undef _DERIV_IDS1
+#undef _TYPE_IDS2
 #undef _DERIV_IDS2
 #undef _TYPE_IDS1
-#undef _TYPE_IDS2
+#undef _DERIV_IDS1
 #undef _FILE
 
-#define _FILE "check.inc"
 #define _SUBFILE "procs.inc"
+#define _FILE "check.inc"
 #define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
-#define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
+#define _DERIV_IDS2 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS2 (_INTEGER | _REAL | _COMPLEX)
 #include "derivs.inc"
-#undef _DERIV_IDS1
+#undef _TYPE_IDS2
 #undef _DERIV_IDS2
 #undef _TYPE_IDS1
-#undef _TYPE_IDS2
+#undef _DERIV_IDS1
 #undef _FILE
 #undef _SUBFILE
 
