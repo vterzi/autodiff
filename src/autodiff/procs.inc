@@ -16,12 +16,9 @@
 #  define _TYPE_CONV0 _TYPE_CONV2
 #  define _TYPE_LABEL0 _TYPE_LABEL2
 #endif
-#if ( \
-    ((_TYPE_ID1 != _INTEGER) && (_TYPE_ID2 == _INTEGER)) \
-    || ( \
-        (_KIND1 >= _KIND2) \
-        && ((_TYPE_ID1 == _INTEGER) == (_TYPE_ID2 == _INTEGER)) \
-    ) \
+#if ((_TYPE_ID1 != _INTEGER) && (_TYPE_ID2 == _INTEGER)) || ( \
+    (_KIND1 >= _KIND2) \
+    && ((_TYPE_ID1 == _INTEGER) == (_TYPE_ID2 == _INTEGER)) \
 )
 #  define _KIND0 _KIND1
 #  define _KIND_LABEL0 _KIND_LABEL1
