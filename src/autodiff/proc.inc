@@ -28,8 +28,8 @@ pure function _PROC(val, grad &
     allocate(r%gradgrad(n * (n + 1) / 2))
     if (upper) then
         do i = 1, n
-            lo = up + i
-            up = up + 1
+            lo = up + 1
+            up = up + i
             if (i <= n2) then
                 if (i <= n1) then
                     r%gradgrad(lo:up) = gradgrad(:i, i)
@@ -45,8 +45,8 @@ pure function _PROC(val, grad &
         end do
     else
         do i = 1, n
-            lo = up + i
-            up = up + 1
+            lo = up + 1
+            up = up + i
             if (i <= n1) then
                 if (i <= n2) then
                     r%gradgrad(lo:up) = gradgrad(i, :i)
@@ -99,8 +99,8 @@ pure function _PROC(x) result(gradgrad)
     n = size(x%grad)
     up = 0
     do i1 = 1, n
-        lo = up + i1
-        up = up + 1
+        lo = up + 1
+        up = up + i1
         gradgrad(:i1, i1) = x%gradgrad(lo:up)
     end do
     do i1 = 2, n
@@ -248,8 +248,8 @@ elemental function _PROC(x, y) result(r)
     allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             x%gradgrad(lo:up) * y%val &
             + x%grad(:i) * y%grad(i) &
@@ -287,8 +287,8 @@ elemental function _PROC(x, y) result(r)
     allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) &
             - factor1 * y%grad(i) * r%grad(:i) &
@@ -343,8 +343,8 @@ elemental function _PROC(x, y) result(r)
     allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) &
             + (factor3 * x%grad(i) + factor * y%grad(i)) * x%grad(:i) &
@@ -497,8 +497,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -525,8 +525,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = r%val * x%gradgrad(lo:up) + r%grad(i) * x%grad(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
@@ -553,8 +553,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = factor * x%gradgrad(lo:up) - r%grad(i) * r%grad(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
@@ -581,8 +581,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor * x%gradgrad(lo:up) - r%val * x%grad(i) * x%grad(:i) &
         )
@@ -611,8 +611,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor * x%gradgrad(lo:up) - r%val * x%grad(i) * x%grad(:i) &
         )
@@ -647,8 +647,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -681,8 +681,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -715,8 +715,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -751,8 +751,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * r%grad(:i) &
         )
@@ -781,8 +781,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor * x%gradgrad(lo:up) + r%val * x%grad(i) * x%grad(:i) &
         )
@@ -811,8 +811,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor * x%gradgrad(lo:up) + r%val * x%grad(i) * x%grad(:i) &
         )
@@ -847,8 +847,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -881,8 +881,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -915,8 +915,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -951,8 +951,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * r%grad(:i) &
         )
@@ -992,8 +992,8 @@ elemental function _PROC(y, x) result(r)
     allocate(r%gradgrad(min(size(y%gradgrad), size(x%gradgrad))))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * y%gradgrad(lo:up) &
             + (factor3 * y%grad(i) + factor4 * x%grad(i)) * y%grad(:i) &
@@ -1033,8 +1033,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor * x%gradgrad(lo:up) - LOG_10 * r%grad(i) * r%grad(:i) &
         )
@@ -1070,8 +1070,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -1107,8 +1107,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
         )
@@ -1144,8 +1144,8 @@ elemental function _PROC(x) result(r)
     allocate(r%gradgrad(size(x%gradgrad)))
     up = 0
     do i = 1, size(r%grad)
-        lo = up + i
-        up = up + 1
+        lo = up + 1
+        up = up + i
         r%gradgrad(lo:up) = ( &
             factor1 * x%gradgrad(lo:up) + factor2 * x%grad(i) * x%grad(:i) &
         )
