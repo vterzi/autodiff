@@ -48,7 +48,7 @@ module autodiff
 
 
     public :: operator(//)
-#define _FILE "mod_proc_decl.inc"
+#define _FILE "decl.inc"
 #define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #define _PROC _CAT(I_cat_,_NAME)
@@ -67,7 +67,7 @@ module autodiff
 
 
 #define _PROC _TYPE_UNARY_OP(_OP)
-#define _FILE "mod_proc_decl.inc"
+#define _FILE "decl.inc"
 #define _DERIV_IDS (_GRAD | _GRADGRAD | _DIVGRAD)
 
 #define _TYPE_IDS (_INTEGER | _REAL)
@@ -144,7 +144,7 @@ module autodiff
 
 
 #define _PROC _CAT4(_OP,_KIND_LABEL2,_,_NAME1)
-#define _FILE "mod_proc_decl.inc"
+#define _FILE "decl.inc"
 #define _DERIV_IDS1 (_GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
 #define _DERIV_IDS2 (_VAL)
@@ -172,7 +172,7 @@ module autodiff
 
 
 #define _PROC _TYPES_BINARY_OP(_OP_NAME)
-#define _SUBFILE "mod_proc_decl.inc"
+#define _SUBFILE "decl.inc"
 #define _FILE "check.inc"
 #define _DERIV_IDS1 (_VAL | _GRAD | _GRADGRAD | _DIVGRAD)
 #define _TYPE_IDS1 (_INTEGER | _REAL | _COMPLEX)
