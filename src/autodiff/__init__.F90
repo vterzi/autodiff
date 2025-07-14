@@ -194,7 +194,7 @@ module autodiff
 #define _OP_NAME div
 #include "iface.inc"
 #define _OP operator(**)
-#define _OP_NAME div
+#define _OP_NAME pow
 #include "iface.inc"
 #undef _TYPE_IDS2
 #undef _DERIV_IDS2
