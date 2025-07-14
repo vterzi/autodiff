@@ -1,27 +1,27 @@
 type, public :: _NAME
     private
-    _ELEM_TYPE :: val
-    _ELEM_TYPE, allocatable :: grad(:)
+    _ELEM_TYPE :: v
+    _ELEM_TYPE, allocatable :: g(:)
 #if _DERIV_ID == _GRADGRAD
-    _ELEM_TYPE, allocatable :: gradgrad(:)
+    _ELEM_TYPE, allocatable :: gg(:)
 #elif _DERIV_ID == _DIVGRAD
-    _ELEM_TYPE :: divgrad
+    _ELEM_TYPE :: dg
 #endif
 contains
 #define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
-    _PROC(get_val)
+    _PROC(val)
 #undef _PROC
 #define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
-    _PROC(get_grad)
+    _PROC(grad)
 #undef _PROC
 #if _DERIV_ID == _GRADGRAD
 #  define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
-    _PROC(get_gradgrad)
+    _PROC(gradgrad)
 #  undef _PROC
 #endif
 #if (_DERIV_ID == _GRADGRAD) || (_DERIV_ID == _DIVGRAD)
 #  define _PROC(X) procedure :: X => _TYPE_UNARY_OP(X)
-    _PROC(get_divgrad)
+    _PROC(divgrad)
 #  undef _PROC
 #endif
 #define _PROC _TYPE_BINARY_OP(eq)

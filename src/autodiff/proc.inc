@@ -19,28 +19,28 @@ pure function _PROC(val, grad &
     integer :: n, n1, n2, i, lo, up, up_
 #endif
 
-    r%val = val
-    r%grad = grad
+    r%v = val
+    r%g = grad
 #if _DERIV_ID == _GRADGRAD
     n = size(grad)
     n1 = size(gradgrad, 1)
     n2 = size(gradgrad, 2)
-    allocate(r%gradgrad(n * (n + 1) / 2))
+    allocate(r%gg(n * (n + 1) / 2))
     if (upper) then
         do i = 1, n
             lo = up + 1
             up = up + i
             if (i <= n2) then
                 if (i <= n1) then
-                    r%gradgrad(lo:up) = gradgrad(:i, i)
+                    r%gg(lo:up) = gradgrad(:i, i)
                 else
                     up_ = up + n1 - i
-                    r%gradgrad(lo:up_) = gradgrad(:n1, i)
+                    r%gg(lo:up_) = gradgrad(:n1, i)
                     up_ = up_ + 1
-                    r%gradgrad(up_:up) = 0
+                    r%gg(up_:up) = 0
                 end if
             else
-                r%gradgrad(lo:up) = 0
+                r%gg(lo:up) = 0
             end if
         end do
     else
@@ -49,59 +49,59 @@ pure function _PROC(val, grad &
             up = up + i
             if (i <= n1) then
                 if (i <= n2) then
-                    r%gradgrad(lo:up) = gradgrad(i, :i)
+                    r%gg(lo:up) = gradgrad(i, :i)
                 else
                     up_ = up + n2 - i
-                    r%gradgrad(lo:up_) = gradgrad(i, :n2)
+                    r%gg(lo:up_) = gradgrad(i, :n2)
                     up_ = up_ + 1
-                    r%gradgrad(up_:up) = 0
+                    r%gg(up_:up) = 0
                 end if
             else
-                r%gradgrad(lo:up) = 0
+                r%gg(lo:up) = 0
             end if
         end do
     end if
 #elif _DERIV_ID == _DIVGRAD
-    r%divgrad = divgrad
+    r%dg = divgrad
 #endif
 end function _PROC
 #undef _PROC
 
 
-#define _PROC _TYPE_UNARY_OP(get_val)
+#define _PROC _TYPE_UNARY_OP(val)
 pure function _PROC(x) result(val)
     class(_NAME), intent(in) :: x
     _ELEM_TYPE :: val
 
-    val = x%val
+    val = x%v
 end function _PROC
 #undef _PROC
 
 
-#define _PROC _TYPE_UNARY_OP(get_grad)
+#define _PROC _TYPE_UNARY_OP(grad)
 pure function _PROC(x) result(grad)
     class(_NAME), intent(in) :: x
-    _ELEM_TYPE :: grad(size(x%grad))
+    _ELEM_TYPE :: grad(size(x%g))
 
-    grad = x%grad
+    grad = x%g
 end function _PROC
 #undef _PROC
 
 
 #if _DERIV_ID == _GRADGRAD
-#  define _PROC _TYPE_UNARY_OP(get_gradgrad)
+#  define _PROC _TYPE_UNARY_OP(gradgrad)
 pure function _PROC(x) result(gradgrad)
     class(_NAME), intent(in) :: x
-    _ELEM_TYPE :: gradgrad(size(x%grad), size(x%grad))
+    _ELEM_TYPE :: gradgrad(size(x%g), size(x%g))
 
     integer :: n, i, j, lo, up
 
-    n = size(x%grad)
+    n = size(x%g)
     up = 0
     do i = 1, n
         lo = up + 1
         up = up + i
-        gradgrad(:i, i) = x%gradgrad(lo:up)
+        gradgrad(:i, i) = x%gg(lo:up)
     end do
     do i = 2, n
         do j = 1, i - 1
@@ -114,24 +114,24 @@ end function _PROC
 
 
 #if _DERIV_ID > _GRAD
-#  define _PROC _TYPE_UNARY_OP(get_divgrad)
+#  define _PROC _TYPE_UNARY_OP(divgrad)
 pure function _PROC(x) result(divgrad)
     class(_NAME), intent(in) :: x
     _ELEM_TYPE :: divgrad
 
 #  if _DERIV_ID == _GRADGRAD
-    integer :: i, idx
+    integer :: i, j
 #  endif
 
 #  if _DERIV_ID == _GRADGRAD
     divgrad = 0
-    idx = 0
-    do i = 1, size(x%grad)
-        idx = idx + i
-        divgrad = divgrad + x%gradgrad(idx)
+    j = 0
+    do i = 1, size(x%g)
+        j = j + i
+        divgrad = divgrad + x%gg(j)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    divgrad = x%divgrad
+    divgrad = x%dg
 #  endif
 end function _PROC
 #  undef _PROC
@@ -144,11 +144,11 @@ elemental function _PROC(x, y) result(r)
     class(_NAME), intent(in) :: x, y
     logical :: r
 
-    r = x%val == y%val .and. all(x%grad == y%grad)
+    r = x%v == y%v .and. all(x%g == y%g)
 #if _DERIV_ID == _GRADGRAD
-    r = r .and. all(x%gradgrad == y%gradgrad)
+    r = r .and. all(x%gg == y%gg)
 #elif _DERIV_ID == _DIVGRAD
-    r = r .and. x%divgrad == y%divgrad
+    r = r .and. x%dg == y%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -159,11 +159,11 @@ elemental function _PROC(x, y) result(r)
     class(_NAME), intent(in) :: x, y
     logical :: r
 
-    r = x%val /= y%val .or. any(x%grad /= y%grad)
+    r = x%v /= y%v .or. any(x%g /= y%g)
 #if _DERIV_ID == _GRADGRAD
-    r = r .or. any(x%gradgrad /= y%gradgrad)
+    r = r .or. any(x%gg /= y%gg)
 #elif _DERIV_ID == _DIVGRAD
-    r = r .or. x%divgrad /= y%divgrad
+    r = r .or. x%dg /= y%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -174,12 +174,12 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    r%val = x%val
-    r%grad = x%grad
+    r%v = x%v
+    r%g = x%g
 #if _DERIV_ID == _GRADGRAD
-    r%gradgrad = x%gradgrad
+    r%gg = x%gg
 #elif _DERIV_ID == _DIVGRAD
-    r%divgrad = x%divgrad
+    r%dg = x%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -190,12 +190,12 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    r%val = -x%val
-    r%grad = -x%grad
+    r%v = -x%v
+    r%g = -x%g
 #if _DERIV_ID == _GRADGRAD
-    r%gradgrad = -x%gradgrad
+    r%gg = -x%gg
 #elif _DERIV_ID == _DIVGRAD
-    r%divgrad = -x%divgrad
+    r%dg = -x%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -206,12 +206,12 @@ elemental function _PROC(x, y) result(r)
     class(_NAME), intent(in) :: x, y
     type(_NAME) :: r
 
-    r%val = x%val + y%val
-    r%grad = x%grad + y%grad
+    r%v = x%v + y%v
+    r%g = x%g + y%g
 #if _DERIV_ID == _GRADGRAD
-    r%gradgrad = x%gradgrad + y%gradgrad
+    r%gg = x%gg + y%gg
 #elif _DERIV_ID == _DIVGRAD
-    r%divgrad = x%divgrad + y%divgrad
+    r%dg = x%dg + y%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -222,12 +222,12 @@ elemental function _PROC(x, y) result(r)
     class(_NAME), intent(in) :: x, y
     type(_NAME) :: r
 
-    r%val = x%val - y%val
-    r%grad = x%grad - y%grad
+    r%v = x%v - y%v
+    r%g = x%g - y%g
 #if _DERIV_ID == _GRADGRAD
-    r%gradgrad = x%gradgrad - y%gradgrad
+    r%gg = x%gg - y%gg
 #elif _DERIV_ID == _DIVGRAD
-    r%divgrad = x%divgrad - y%divgrad
+    r%dg = x%dg - y%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -242,27 +242,23 @@ elemental function _PROC(x, y) result(r)
     integer :: i, lo, up
 #endif
 
-    r%val = x%val * y%val
-    r%grad = x%grad * y%val + x%val * y%grad
+    r%v = x%v * y%v
+    r%g = x%g * y%v + x%v * y%g
 #if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
+    allocate(r%gg(min(size(x%gg), size(y%gg))))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            x%gradgrad(lo:up) * y%val &
-            + x%grad(:i) * y%grad(i) &
-            + x%grad(i) * y%grad(:i) &
-            + x%val * y%gradgrad(lo:up) &
+        r%gg(lo:up) = ( &
+            x%gg(lo:up) * y%v &
+            + x%g(:i) * y%g(i) &
+            + x%g(i) * y%g(:i) &
+            + x%v * y%gg(lo:up) &
         )
     end do
 #elif _DERIV_ID == _DIVGRAD
-    r%divgrad = ( &
-        x%divgrad * y%val &
-        + 2 * dot_product(x%grad, y%grad) &
-        + x%val * y%divgrad &
-    )
+    r%dg = x%dg * y%v + 2 * dot_product(x%g, y%g) + x%v * y%dg
 #endif
 end function _PROC
 #undef _PROC
@@ -274,34 +270,30 @@ elemental function _PROC(x, y) result(r)
     type(_NAME) :: r
 
 #if _TYPE_ID != _INTEGER
-    _ELEM_TYPE :: factor1, factor2
+    _ELEM_TYPE :: f1, f2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    factor1 = 1 / y%val
-    r%val = x%val * factor1
-    factor2 = factor1 * r%val
-    r%grad = factor1 * x%grad - factor2 * y%grad
+    f1 = 1 / y%v
+    r%v = x%v * f1
+    f2 = f1 * r%v
+    r%g = f1 * x%g - f2 * y%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
+    allocate(r%gg(min(size(x%gg), size(y%gg))))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) &
-            - factor1 * y%grad(i) * r%grad(:i) &
-            - factor1 * r%grad(i) * y%grad(:i) &
-            - factor2 * y%gradgrad(lo:up) &
+        r%gg(lo:up) = ( &
+            f1 * x%gg(lo:up) &
+            - f1 * y%g(i) * r%g(:i) &
+            - f1 * r%g(i) * y%g(:i) &
+            - f2 * y%gg(lo:up) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = ( &
-        factor1 * x%divgrad &
-        - 2 * factor1 * dot_product(y%grad, r%grad) &
-        - factor2 * y%divgrad &
-    )
+    r%dg = f1 * x%dg - 2 * f1 * dot_product(y%g, r%g) - f2 * y%dg
 #  endif
 #else
     r = real(x) / real(y)
@@ -316,51 +308,51 @@ elemental function _PROC(x, y) result(r)
     type(_NAME) :: r
 
 #if _TYPE_ID != _INTEGER
-    _ELEM_TYPE :: factor, factor1, factor2
+    _ELEM_TYPE :: f, f1, f2
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor3, factor4
+    _ELEM_TYPE :: f3, f4
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = x%val**y%val
-    factor = 1 / x%val
-    factor1 = y%val * factor
-    factor2 = log(x%val)
+    r%v = x%v**y%v
+    f = 1 / x%v
+    f1 = y%v * f
+    f2 = log(x%v)
 #  if _DERIV_ID > _GRAD
-    factor3 = factor1 * (factor1 - factor)
-    factor4 = factor2**2
-    factor = (factor1 * factor2 + factor)
+    f3 = f1 * (f1 - f)
+    f4 = f2**2
+    f = (f1 * f2 + f)
 #  endif
-    factor1 = factor1 * r%val
-    factor2 = factor2 * r%val
-    r%grad = factor1 * x%grad + factor2 * y%grad
+    f1 = f1 * r%v
+    f2 = f2 * r%v
+    r%g = f1 * x%g + f2 * y%g
 #  if _DERIV_ID == _GRADGRAD
-    factor3 = factor3 * r%val
-    factor4 = factor4 * r%val
-    factor = factor * r%val
-    allocate(r%gradgrad(min(size(x%gradgrad), size(y%gradgrad))))
+    f3 = f3 * r%v
+    f4 = f4 * r%v
+    f = f * r%v
+    allocate(r%gg(min(size(x%gg), size(y%gg))))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) &
-            + (factor3 * x%grad(i) + factor * y%grad(i)) * x%grad(:i) &
-            + (factor * x%grad(i) + factor4 * y%grad(i)) * y%grad(:i) &
-            + factor2 * y%gradgrad(lo:up) &
+        r%gg(lo:up) = ( &
+            f1 * x%gg(lo:up) &
+            + (f3 * x%g(i) + f * y%g(i)) * x%g(:i) &
+            + (f * x%g(i) + f4 * y%g(i)) * y%g(:i) &
+            + f2 * y%gg(lo:up) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = ( &
-        factor1 * x%divgrad &
-        + r%val * ( &
-            factor3 * dot_product(x%grad, x%grad) &
-            + 2 * factor * dot_product(x%grad, y%grad) &
-            + factor4 * dot_product(y%grad, y%grad) &
+    r%dg = ( &
+        f1 * x%dg &
+        + r%v * ( &
+            f3 * dot_product(x%g, x%g) &
+            + 2 * f * dot_product(x%g, y%g) &
+            + f4 * dot_product(y%g, y%g) &
         ) &
-        + factor2 * y%divgrad &
+        + f2 * y%dg &
     )
 #  endif
 #else
@@ -377,7 +369,7 @@ elemental function _PROC(a, b) result(r)
     class(_NAME), intent(in) :: a, b
     type(_NAME) :: r
 
-    if (a%val == sign(a%val, b%val)) then
+    if (a%v == sign(a%v, b%v)) then
         r = a
     else
         r = -a
@@ -393,12 +385,12 @@ elemental function _PROC(a) result(r)
     class(_NAME), intent(in) :: a
     type(_CAT3(_DERIV,R,_KIND_LABEL)) :: r
 
-    r%val = real(a%val)
-    r%grad = real(a%grad)
+    r%v = real(a%v)
+    r%g = real(a%g)
 #  if _DERIV_ID == _GRADGRAD
-    r%gradgrad = real(a%gradgrad)
+    r%gg = real(a%gg)
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = real(a%divgrad)
+    r%dg = real(a%dg)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -409,12 +401,12 @@ elemental function _PROC(z) result(r)
     class(_NAME), intent(in) :: z
     type(_CAT3(_DERIV,R,_KIND_LABEL)) :: r
 
-    r%val = aimag(z%val)
-    r%grad = aimag(z%grad)
+    r%v = aimag(z%v)
+    r%g = aimag(z%g)
 #  if _DERIV_ID == _GRADGRAD
-    r%gradgrad = aimag(z%gradgrad)
+    r%gg = aimag(z%gg)
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = aimag(z%divgrad)
+    r%dg = aimag(z%dg)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -425,12 +417,12 @@ elemental function _PROC(z) result(r)
     class(_NAME), intent(in) :: z
     type(_NAME) :: r
 
-    r%val = conjg(z%val)
-    r%grad = conjg(z%grad)
+    r%v = conjg(z%v)
+    r%g = conjg(z%g)
 #  if _DERIV_ID == _GRADGRAD
-    r%gradgrad = conjg(z%gradgrad)
+    r%gg = conjg(z%gg)
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = conjg(z%divgrad)
+    r%dg = conjg(z%dg)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -442,7 +434,7 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     integer :: r
 
-    r = kind(x%val)
+    r = kind(x%v)
 end function _PROC
 #undef _PROC
 
@@ -455,17 +447,17 @@ elemental function _PROC(a) result(r)
 #if _TYPE_ID == _COMPLEX
     r = sqrt(a * conjg(a))
 #else
-    if (a%val > 0) then
+    if (a%v > 0) then
         r = a
-    else if (a%val < 0) then
+    else if (a%v < 0) then
         r = -a
     else
-        r%val = a%val
-        r%grad = 0 / r%val
+        r%v = a%v
+        r%g = 0 / r%v
 #  if _DERIV_ID == _GRADGRAD
-        r%gradgrad = 0 / r%val
+        r%gg = 0 / r%v
 #  elif _DERIV_ID == _DIVGRAD
-        r%divgrad = 0 / r%val
+        r%dg = 0 / r%v
 #  endif
     end if
 #endif
@@ -479,32 +471,30 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = sqrt(x%val)
-    factor1 = 1 / (2 * r%val)
-    r%grad = factor1 * x%grad
+    r%v = sqrt(x%v)
+    f1 = 1 / (2 * r%v)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -2 * factor1**2
+    f2 = -2 * f1**2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -519,18 +509,18 @@ elemental function _PROC(x) result(r)
     integer :: i, lo, up
 #  endif
 
-    r%val = exp(x%val)
-    r%grad = r%val * x%grad
+    r%v = exp(x%v)
+    r%g = r%v * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = r%val * x%gradgrad(lo:up) + r%grad(i) * x%grad(:i)
+        r%gg(lo:up) = r%v * x%gg(lo:up) + r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = r%val * x%divgrad + dot_product(r%grad, x%grad)
+    r%dg = r%v * x%dg + dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -541,24 +531,24 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor
+    _ELEM_TYPE :: f
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = log(x%val)
-    factor = 1 / x%val
-    r%grad = factor * x%grad
+    r%v = log(x%v)
+    f = 1 / x%v
+    r%g = f * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = factor * x%gradgrad(lo:up) - r%grad(i) * r%grad(:i)
+        r%gg(lo:up) = f * x%gg(lo:up) - r%g(i) * r%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor * x%divgrad - dot_product(r%grad, r%grad)
+    r%dg = f * x%dg - dot_product(r%g, r%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -569,26 +559,24 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor
+    _ELEM_TYPE :: f
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = sin(x%val)
-    factor = cos(x%val)
-    r%grad = factor * x%grad
+    r%v = sin(x%v)
+    f = cos(x%v)
+    r%g = f * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor * x%gradgrad(lo:up) - r%val * x%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f * x%gg(lo:up) - r%v * x%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor * x%divgrad - r%val * dot_product(x%grad, x%grad)
+    r%dg = f * x%dg - r%v * dot_product(x%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -599,26 +587,24 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor
+    _ELEM_TYPE :: f
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = cos(x%val)
-    factor = -sin(x%val)
-    r%grad = factor * x%grad
+    r%v = cos(x%v)
+    f = -sin(x%v)
+    r%g = f * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor * x%gradgrad(lo:up) - r%val * x%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f * x%gg(lo:up) - r%v * x%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor * x%divgrad - r%val * dot_product(x%grad, x%grad)
+    r%dg = f * x%dg - r%v * dot_product(x%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -629,32 +615,30 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = tan(x%val)
-    factor1 = 1 + r%val**2
-    r%grad = factor1 * x%grad
+    r%v = tan(x%v)
+    f1 = 1 + r%v**2
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = 2 * r%val
+    f2 = 2 * r%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -665,30 +649,28 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1, factor2
+    _ELEM_TYPE :: f1, f2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = asin(x%val)
-    factor2 = 1 / (1 - x%val**2)
-    factor1 = sqrt(factor2)
-    r%grad = factor1 * x%grad
+    r%v = asin(x%v)
+    f2 = 1 / (1 - x%v**2)
+    f1 = sqrt(f2)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = factor2 * x%val
+    f2 = f2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -699,30 +681,28 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1, factor2
+    _ELEM_TYPE :: f1, f2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = acos(x%val)
-    factor2 = 1 / (1 - x%val**2)
-    factor1 = -sqrt(factor2)
-    r%grad = factor1 * x%grad
+    r%v = acos(x%v)
+    f2 = 1 / (1 - x%v**2)
+    f1 = -sqrt(f2)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = factor2 * x%val
+    f2 = f2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -733,32 +713,30 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = atan(x%val)
-    factor1 = 1 / (1 + x%val**2)
-    r%grad = factor1 * x%grad
+    r%v = atan(x%v)
+    f1 = 1 / (1 + x%v**2)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -2 * x%val
+    f2 = -2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * r%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * r%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, r%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, r%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -769,26 +747,24 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor
+    _ELEM_TYPE :: f
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = sinh(x%val)
-    factor = cosh(x%val)
-    r%grad = factor * x%grad
+    r%v = sinh(x%v)
+    f = cosh(x%v)
+    r%g = f * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor * x%gradgrad(lo:up) + r%val * x%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f * x%gg(lo:up) + r%v * x%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor * x%divgrad + r%val * dot_product(x%grad, x%grad)
+    r%dg = f * x%dg + r%v * dot_product(x%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -799,26 +775,24 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor
+    _ELEM_TYPE :: f
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = cosh(x%val)
-    factor = sinh(x%val)
-    r%grad = factor * x%grad
+    r%v = cosh(x%v)
+    f = sinh(x%v)
+    r%g = f * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor * x%gradgrad(lo:up) + r%val * x%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f * x%gg(lo:up) + r%v * x%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor * x%divgrad + r%val * dot_product(x%grad, x%grad)
+    r%dg = f * x%dg + r%v * dot_product(x%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -829,32 +803,30 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = tanh(x%val)
-    factor1 = 1 - r%val**2
-    r%grad = factor1 * x%grad
+    r%v = tanh(x%v)
+    f1 = 1 - r%v**2
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -2 * r%val
+    f2 = -2 * r%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -865,30 +837,28 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1, factor2
+    _ELEM_TYPE :: f1, f2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = asinh(x%val)
-    factor2 = 1 / (1 + x%val**2)
-    factor1 = sqrt(factor2)
-    r%grad = factor1 * x%grad
+    r%v = asinh(x%v)
+    f2 = 1 / (1 + x%v**2)
+    f1 = sqrt(f2)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -factor2 * x%val
+    f2 = -f2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -899,30 +869,28 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1, factor2
+    _ELEM_TYPE :: f1, f2
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = acosh(x%val)
-    factor2 = -1 / (1 - x%val**2)
-    factor1 = sqrt(factor2)
-    r%grad = factor1 * x%grad
+    r%v = acosh(x%v)
+    f2 = -1 / (1 - x%v**2)
+    f1 = sqrt(f2)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -factor2 * x%val
+    f2 = -f2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -933,32 +901,30 @@ elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = atanh(x%val)
-    factor1 = 1 / (1 - x%val**2)
-    r%grad = factor1 * x%grad
+    r%v = atanh(x%v)
+    f1 = 1 / (1 - x%v**2)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = 2 * x%val
+    f2 = 2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * r%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * r%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, r%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, r%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -971,44 +937,42 @@ elemental function _PROC(y, x) result(r)
     class(_NAME), intent(in) :: y, x
     type(_NAME) :: r
 
-    _ELEM_TYPE :: factor, factor1, factor2
+    _ELEM_TYPE :: f, f1, f2
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor3, factor4
+    _ELEM_TYPE :: f3, f4
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = atan2(y%val, x%val)
-    factor = 1 / (y%val**2 + x%val**2)
-    factor1 = x%val * factor
-    factor2 = y%val * factor
-    r%grad = factor1 * y%grad - factor2 * x%grad
+    r%v = atan2(y%v, x%v)
+    f = 1 / (y%v**2 + x%v**2)
+    f1 = x%v * f
+    f2 = y%v * f
+    r%g = f1 * y%g - f2 * x%g
 #  if _DERIV_ID > _GRAD
-    factor3 = 2 * factor1 * factor2
-    factor4 = factor1**2 - factor2**2
+    f3 = 2 * f1 * f2
+    f4 = f1**2 - f2**2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(min(size(y%gradgrad), size(x%gradgrad))))
+    allocate(r%gg(min(size(y%gg), size(x%gg))))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * y%gradgrad(lo:up) &
-            + (factor3 * y%grad(i) + factor4 * x%grad(i)) * y%grad(:i) &
-            + (factor4 * y%grad(i) - factor3 * x%grad(i)) * x%grad(:i) &
-            - factor2 * x%gradgrad(lo:up) &
+        r%gg(lo:up) = ( &
+            f1 * y%gg(lo:up) &
+            + (f3 * y%g(i) + f4 * x%g(i)) * y%g(:i) &
+            + (f4 * y%g(i) - f3 * x%g(i)) * x%g(:i) &
+            - f2 * x%gg(lo:up) &
         )
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = ( &
-        factor1 * y%divgrad &
-        + factor3 * ( &
-            dot_product(y%grad, y%grad) - dot_product(x%grad, x%grad) &
-        ) &
-        + 2 * factor4 * dot_product(y%grad, x%grad) &
-        - factor2 * x%divgrad &
+    r%dg = ( &
+        f1 * y%dg &
+        + f3 * (dot_product(y%g, y%g) - dot_product(x%g, x%g)) &
+        + 2 * f4 * dot_product(y%g, x%g) &
+        - f2 * x%dg &
     )
 #  endif
 end function _PROC
@@ -1021,26 +985,24 @@ elemental function _PROC(x) result(r)
     type(_NAME) :: r
 
     _ELEM_TYPE, parameter :: LOG_10 = log(_CONV(10))
-    _ELEM_TYPE :: factor
+    _ELEM_TYPE :: f
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = log10(x%val)
-    factor = 1 / (x%val * LOG_10)
-    r%grad = factor * x%grad
+    r%v = log10(x%v)
+    f = 1 / (x%v * LOG_10)
+    r%g = f * x%g
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor * x%gradgrad(lo:up) - LOG_10 * r%grad(i) * r%grad(:i) &
-        )
+        r%gg(lo:up) = f * x%gg(lo:up) - LOG_10 * r%g(i) * r%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor * x%divgrad - LOG_10 * dot_product(r%grad, r%grad)
+    r%dg = f * x%dg - LOG_10 * dot_product(r%g, r%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -1052,32 +1014,30 @@ elemental function _PROC(x) result(r)
     type(_NAME) :: r
 
     _ELEM_TYPE, parameter :: PI = acos(_CONV(-1))
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = erf(x%val)
-    factor1 = 2 * exp(-x%val**2) / sqrt(PI)
-    r%grad = factor1 * x%grad
+    r%v = erf(x%v)
+    f1 = 2 * exp(-x%v**2) / sqrt(PI)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -2 * x%val
+    f2 = -2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -1089,32 +1049,30 @@ elemental function _PROC(x) result(r)
     type(_NAME) :: r
 
     _ELEM_TYPE, parameter :: PI = acos(_CONV(-1))
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = erfc(x%val)
-    factor1 = -2 * exp(-x%val**2) / sqrt(PI)
-    r%grad = factor1 * x%grad
+    r%v = erfc(x%v)
+    f1 = -2 * exp(-x%v**2) / sqrt(PI)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = -2 * x%val
+    f2 = -2 * x%v
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * r%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * r%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(r%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(r%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC
@@ -1126,32 +1084,30 @@ elemental function _PROC(x) result(r)
     type(_NAME) :: r
 
     _ELEM_TYPE, parameter :: PI = acos(_CONV(-1))
-    _ELEM_TYPE :: factor1
+    _ELEM_TYPE :: f1
 #  if _DERIV_ID > _GRAD
-    _ELEM_TYPE :: factor2
+    _ELEM_TYPE :: f2
 #  endif
 #  if _DERIV_ID == _GRADGRAD
     integer :: i, lo, up
 #  endif
 
-    r%val = erfc_scaled(x%val)
-    factor1 = 2 * x%val * r%val - 2 / sqrt(PI)
-    r%grad = factor1 * x%grad
+    r%v = erfc_scaled(x%v)
+    f1 = 2 * x%v * r%v - 2 / sqrt(PI)
+    r%g = f1 * x%g
 #  if _DERIV_ID > _GRAD
-    factor2 = 2 * (factor1 * x%val + r%val)
+    f2 = 2 * (f1 * x%v + r%v)
 #  endif
 #  if _DERIV_ID == _GRADGRAD
-    allocate(r%gradgrad(size(x%gradgrad)))
+    allocate(r%gg(size(x%gg)))
     up = 0
-    do i = 1, size(r%grad)
+    do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gradgrad(lo:up) = ( &
-            factor1 * x%gradgrad(lo:up) + factor2 * x%grad(i) * x%grad(:i) &
-        )
+        r%gg(lo:up) = f1 * x%gg(lo:up) + f2 * x%g(i) * x%g(:i)
     end do
 #  elif _DERIV_ID == _DIVGRAD
-    r%divgrad = factor1 * x%divgrad + factor2 * dot_product(x%grad, x%grad)
+    r%dg = f1 * x%dg + f2 * dot_product(x%g, x%g)
 #  endif
 end function _PROC
 #  undef _PROC

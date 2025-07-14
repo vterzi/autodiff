@@ -10,12 +10,12 @@ elemental function _PROC(x, y, kind) result(r)
 #endif
     type(_CAT(_DERIV1,_LABEL2)) :: r
 
-    r%val = cmplx(x%val, y%val, _KIND2)
-    r%grad = cmplx(x%grad, y%grad, _KIND2)
+    r%v = cmplx(x%v, y%v, _KIND2)
+    r%g = cmplx(x%g, y%g, _KIND2)
 #if _DERIV1 == _GRADGRAD
-    r%gradgrad = cmplx(x%gradgrad, y%gradgrad, _KIND2)
+    r%gg = cmplx(x%gg, y%gg, _KIND2)
 #elif _DERIV1 == _DIVGRAD
-    r%divgrad = cmplx(x%divgrad, y%divgrad, _KIND2)
+    r%dg = cmplx(x%dg, y%dg, _KIND2)
 #endif
 end function _PROC
 #undef _PROC
