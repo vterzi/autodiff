@@ -363,6 +363,106 @@ end function _PROC
 
 ! -----------------------------------------------------------------------------
 
+#define _PROC _CAT(I_cat_,_NAME)
+elemental function _PROC(x, y) result(r)
+    integer, intent(in) :: x
+    class(_NAME), intent(in) :: y
+    type(_NAME) :: r
+
+    integer :: n, m, j
+#if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up, lo_, up_
+#endif
+
+    r%v = y%v
+    n = size(y%g)
+    m = max(n + x, 0)
+#if _DERIV_ID == _GRADGRAD
+    allocate(r%gg(m * (m + 1) / 2))
+#endif
+    if (m > n) then
+        j = x
+        allocate(r%g(m))
+        r%g(:j) = 0
+        r%g(j + 1 :) = y%g
+#if _DERIV_ID == _GRADGRAD
+        up = j * (j + 1) / 2
+        up_ = 0
+        r%gg(:up) = 0
+        do i = 1, n
+            up = up + j
+            lo = up + 1
+            up = up + i
+            lo_ = up_ + 1
+            up_ = up_ + i
+            r%gg(lo - j : lo - 1) = 0
+            r%gg(lo:up) = y%gg(lo_:up_)
+        end do
+#endif
+    else if (m > 0) then
+        j = -x
+        r%g = y%g(j + 1 :)
+#if _DERIV_ID == _GRADGRAD
+        up = j * (j + 1) / 2
+        up_ = 0
+        do i = 1, m
+            up = up + j
+            lo = up + 1
+            up = up + i
+            lo_ = up_ + 1
+            up_ = up_ + i
+            r%gg(lo_:up_) = y%gg(lo:up)
+        end do
+#endif
+    else
+#if _DERIV_ID == _DIVGRAD
+        r%dg = 0
+#endif
+    end if
+end function _PROC
+#undef _PROC
+
+
+#define _PROC _CAT(_NAME,_cat_I)
+elemental function _PROC(x, y) result(r)
+    class(_NAME), intent(in) :: x
+    integer, intent(in) :: y
+    type(_NAME) :: r
+
+    integer :: n, m
+#if _DERIV_ID == _GRADGRAD
+    integer :: n_, m_
+#endif
+
+    r%v = x%v
+    n = size(x%g)
+    m = max(n + y, 0)
+#if _DERIV_ID == _GRADGRAD
+    m_ = m * (m + 1) / 2
+#endif
+    if (m > n) then
+        allocate(r%g(m))
+        r%g(:n) = x%g
+        r%g(n + 1 :) = 0
+#if _DERIV_ID == _GRADGRAD
+        allocate(r%gg(m_))
+        n_ = size(x%gg)
+        r%gg(:n_) = x%gg
+        r%gg(n_ + 1 :) = 0
+#endif
+    else
+        r%g = x%g(:m)
+#if _DERIV_ID == _GRADGRAD
+        r%gg = x%gg(:m_)
+#elif _DERIV_ID == _DIVGRAD
+        if (m == 0) r%dg = 0
+#endif
+    end if
+end function _PROC
+#undef _PROC
+
+! -----------------------------------------------------------------------------
+
 #if _TYPE_ID != _COMPLEX
 #  define _PROC _TYPE_UNARY_OP(sign)
 elemental function _PROC(a, b) result(r)
