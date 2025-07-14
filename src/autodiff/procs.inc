@@ -134,28 +134,28 @@ elemental function _PROC(x, y) result(r)
     _RES_TYPE :: r
 
 #if (_DERIV_ID1 == _VAL) || (_DERIV_ID2 == _VAL)
-    _ELEM_TYPE0 :: v
+    _ELEM_TYPE0 :: f
 #else
     _RES_TYPE :: t
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
-    v = _CONV0(y)
-    r%v = x%v * v
-    r%g = x%g * v
+    f = _CONV0(y)
+    r%v = x%v * f
+    r%g = x%g * f
 #  if _DERIV_ID0 == _GRADGRAD
-    r%gg = x%gg * v
+    r%gg = x%gg * f
 #  elif _DERIV_ID0 == _DIVGRAD
-    r%dg = x%dg * v
+    r%dg = x%dg * f
 #  endif
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
-    v = _CONV0(x)
-    r%v = v * y%v
-    r%g = v * y%g
+    f = _CONV0(x)
+    r%v = f * y%v
+    r%g = f * y%g
 #  if _DERIV_ID0 == _GRADGRAD
-    r%gg = v * y%gg
+    r%gg = f * y%gg
 #  elif _DERIV_ID0 == _DIVGRAD
-    r%dg = v * y%dg
+    r%dg = f * y%dg
 #  endif
 #else
     r = x
