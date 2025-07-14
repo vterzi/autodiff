@@ -45,7 +45,7 @@ elemental subroutine _PROC(v, expr)
     _ARG_TYPE1, intent(inout) :: v
     _ARG_TYPE2, intent(in) :: expr
 
-#if _DERIV_ID1 == _GRADGRAD
+#if (_DERIV_ID1 == _GRADGRAD) && (_DERIV_ID2 != _GRADGRAD)
     integer :: n
 #endif
 
@@ -140,22 +140,24 @@ elemental function _PROC(x, y) result(r)
 #endif
 
 #if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
+    r = x
     f = _CONV0(y)
-    r%v = x%v * f
-    r%g = x%g * f
+    r%v = r%v * f
+    r%g = r%g * f
 #  if _DERIV_ID0 == _GRADGRAD
-    r%gg = x%gg * f
+    r%gg = r%gg * f
 #  elif _DERIV_ID0 == _DIVGRAD
-    r%dg = x%dg * f
+    r%dg = r%dg * f
 #  endif
 #elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
     f = _CONV0(x)
-    r%v = f * y%v
-    r%g = f * y%g
+    r = y
+    r%v = f * r%v
+    r%g = f * r%g
 #  if _DERIV_ID0 == _GRADGRAD
-    r%gg = f * y%gg
+    r%gg = f * r%gg
 #  elif _DERIV_ID0 == _DIVGRAD
-    r%dg = f * y%dg
+    r%dg = f * r%dg
 #  endif
 #else
     r = x
@@ -187,18 +189,19 @@ elemental function _PROC(x, y) result(r)
 #  endif
 
 #  if (_DERIV_ID1 != _VAL) && (_DERIV_ID2 == _VAL)
+    r = x
     f = 1 / _CONV0(y)
-    r%v = x%v * f
-    r%g = x%g * f
+    r%v = r%v * f
+    r%g = r%g * f
 #    if _DERIV_ID0 == _GRADGRAD
-    r%gg = x%gg * f
+    r%gg = r%gg * f
 #    elif _DERIV_ID0 == _DIVGRAD
-    r%dg = x%dg * f
+    r%dg = r%dg * f
 #    endif
 #  elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
     t = y
     f2 = 1 / t%v
-    r%v = x * f2
+    r%v = _CONV0(x) * f2
     f1 = -f2 * r%v
     r%g = f1 * t%g
 #    if _DERIV_ID0 > _GRAD
