@@ -19,3 +19,12 @@ include(cmake/kinds.cmake)
 
 add_subdirectory(src)
 add_subdirectory(tests)
+
+install(TARGETS autodiff
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+)
+install(DIRECTORY "${PROJECT_BINARY_DIR}/include"
+    DESTINATION .
+    FILES_MATCHING PATTERN "*.mod"
+)
