@@ -11,9 +11,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 set(CMAKE_Fortran_MODULE_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 
-set(EXCLUDED_KINDS "K1;K2;K16;HP;XDP;QP"
+set(EXCLUDED_KINDS "K1;K2;K8;K16;HP;XDP;QP"
     CACHE STRING
-    "Semicolon-separated list of excluded kinds"
+    "Semicolon-separated list of kinds to exclude"
 )
 include(cmake/kinds.cmake)
 
