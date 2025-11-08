@@ -1,8 +1,8 @@
-#define _PASTE(X) X
-#define _CAT(A,B) _PASTE(A)B
-#define _CAT3(A,B,C) _CAT(_CAT(A,B),C)
-#define _CAT4(A,B,C,D) _CAT(_CAT3(A,B,C),D)
-#define _CAT5(A,B,C,D,E) _CAT(_CAT4(A,B,C,D),E)
+#define _(X) X
+#define _CAT(A,B) _(A)B
+#define _CAT3(A,B,C) _(A)_(B)C
+#define _CAT4(A,B,C,D) _(A)_(B)_(C)D
+#define _CAT5(A,B,C,D,E) _(A)_(B)_(C)_(D)E
 
 #define _INTEGER (1 << (_KIND_BITS))
 #define _REAL (1 << (_KIND_BITS + 1))
