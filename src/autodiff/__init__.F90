@@ -128,6 +128,8 @@ module autodiff
 #define _TYPE_IDS (_REAL)
 #define _OP atan2
 #include "iface.inc"
+#define _OP hypot
+#include "iface.inc"
 #define _OP log10
 #include "iface.inc"
 #define _OP erf

@@ -1079,6 +1079,46 @@ end function _PROC
 #  undef _PROC
 
 
+#  define _PROC _TYPE_UNARY_OP(hypot)
+elemental function _PROC(x, y) result(r)
+    class(_NAME), intent(in) :: x, y
+    type(_NAME) :: r
+
+    _ELEM_TYPE :: f
+#  if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up
+#  endif
+
+    r%v = hypot(x%v, y%v)
+    f = 1 / r%v
+    r%g = f * (x%v * x%g + y%v * y%g)
+#  if _DERIV_ID == _GRADGRAD
+    allocate(r%gg(min(size(x%gg), size(y%gg))))
+    up = 0
+    do i = 1, size(r%g)
+        lo = up + 1
+        up = up + i
+        r%gg(lo:up) = f * ( &
+            x%v * x%gg(lo:up) &
+            + y%v * y%gg(lo:up) &
+            + x%g(i) * x%g(:i) &
+            + y%g(i) * y%g(:i) &
+            - r%g(i) * r%g(:i) &
+        )
+    end do
+#  elif _DERIV_ID == _DIVGRAD
+    r%dg = f * ( &
+        x%v * x%dg &
+        + y%v * y%dg &
+        + dot_product(x%g, x%g) &
+        + dot_product(y%g, y%g) &
+        - dot_product(r%g, r%g) &
+    )
+#  endif
+end function _PROC
+#  undef _PROC
+
+
 #  define _PROC _TYPE_UNARY_OP(log10)
 elemental function _PROC(x) result(r)
     class(_NAME), intent(in) :: x
