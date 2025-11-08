@@ -83,12 +83,13 @@ elemental function _PROC(x, y) result(r)
     _ARG_TYPE2, intent(in) :: y
     logical :: r
 
-#if (_DERIV_ID1 == _GRAD) && (_DERIV_ID2 == _GRAD)
+#if _DERIV_ID1 == _DERIV_ID2
     r = x%v == y%v .and. all(x%g == y%g)
-#elif (_DERIV_ID1 == _GRADGRAD) && (_DERIV_ID2 == _GRADGRAD)
-    r = x%v == y%v .and. all(x%g == y%g) .and. all(x%gg == y%gg)
-#elif (_DERIV_ID1 == _DIVGRAD) && (_DERIV_ID2 == _DIVGRAD)
-    r = x%v == y%v .and. all(x%g == y%g) .and. x%dg == y%dg
+#  if _DERIV_ID0 == _GRADGRAD
+    r = r .and. all(x%gg == y%gg)
+#  elif _DERIV_ID0 == _DIVGRAD
+    r = r .and. x%dg == y%dg
+#  endif
 #else
     r = .false.
 #endif
@@ -102,12 +103,13 @@ elemental function _PROC(x, y) result(r)
     _ARG_TYPE2, intent(in) :: y
     logical :: r
 
-#if (_DERIV_ID1 == _GRAD) && (_DERIV_ID2 == _GRAD)
+#if _DERIV_ID1 == _DERIV_ID2
     r = x%v /= y%v .or. any(x%g /= y%g)
-#elif (_DERIV_ID1 == _GRADGRAD) && (_DERIV_ID2 == _GRADGRAD)
-    r = x%v /= y%v .or. any(x%g /= y%g) .or. any(x%gg /= y%gg)
-#elif (_DERIV_ID1 == _DIVGRAD) && (_DERIV_ID2 == _DIVGRAD)
-    r = x%v /= y%v .or. any(x%g /= y%g) .or. x%dg /= y%dg
+#  if _DERIV_ID0 == _GRADGRAD
+    r = r .or. any(x%gg /= y%gg)
+#  elif _DERIV_ID0 == _DIVGRAD
+    r = r .or. x%dg /= y%dg
+#  endif
 #else
     r = .true.
 #endif
