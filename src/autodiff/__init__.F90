@@ -181,6 +181,12 @@ module autodiff
 #define _OP assignment(=)
 #define _OP_NAME assign
 #include "iface.inc"
+#define _OP operator(==)
+#define _OP_NAME eq
+#include "iface.inc"
+#define _OP operator(/=)
+#define _OP_NAME ne
+#include "iface.inc"
 #define _OP operator(+)
 #define _OP_NAME add
 #include "iface.inc"

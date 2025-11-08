@@ -77,6 +77,44 @@ end subroutine _PROC
 #undef _PROC
 
 
+#define _PROC _TYPES_BINARY_OP(eq)
+elemental function _PROC(x, y) result(r)
+    _ARG_TYPE1, intent(in) :: x
+    _ARG_TYPE2, intent(in) :: y
+    logical :: r
+
+#if (_DERIV_ID1 == _GRAD) && (_DERIV_ID2 == _GRAD)
+    r = x%v == y%v .and. all(x%g == y%g)
+#elif (_DERIV_ID1 == _GRADGRAD) && (_DERIV_ID2 == _GRADGRAD)
+    r = x%v == y%v .and. all(x%g == y%g) .and. all(x%gg == y%gg)
+#elif (_DERIV_ID1 == _DIVGRAD) && (_DERIV_ID2 == _DIVGRAD)
+    r = x%v == y%v .and. all(x%g == y%g) .and. x%dg == y%dg
+#else
+    r = .false.
+#endif
+end function _PROC
+#undef _PROC
+
+
+#define _PROC _TYPES_BINARY_OP(ne)
+elemental function _PROC(x, y) result(r)
+    _ARG_TYPE1, intent(in) :: x
+    _ARG_TYPE2, intent(in) :: y
+    logical :: r
+
+#if (_DERIV_ID1 == _GRAD) && (_DERIV_ID2 == _GRAD)
+    r = x%v /= y%v .or. any(x%g /= y%g)
+#elif (_DERIV_ID1 == _GRADGRAD) && (_DERIV_ID2 == _GRADGRAD)
+    r = x%v /= y%v .or. any(x%g /= y%g) .or. any(x%gg /= y%gg)
+#elif (_DERIV_ID1 == _DIVGRAD) && (_DERIV_ID2 == _DIVGRAD)
+    r = x%v /= y%v .or. any(x%g /= y%g) .or. x%dg /= y%dg
+#else
+    r = .true.
+#endif
+end function _PROC
+#undef _PROC
+
+
 #define _PROC _TYPES_BINARY_OP(add)
 elemental function _PROC(x, y) result(r)
     _ARG_TYPE1, intent(in) :: x
