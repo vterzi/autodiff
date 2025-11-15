@@ -26,6 +26,7 @@ pure function _PROC(val, grad &
     n1 = size(gradgrad, 1)
     n2 = size(gradgrad, 2)
     allocate(r%gg(n * (n + 1) / 2))
+    up = 0
     if (upper) then
         do i = 1, n
             lo = up + 1
