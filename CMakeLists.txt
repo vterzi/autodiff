@@ -18,8 +18,11 @@ set(EXCLUDED_KINDS "K1;K2;K8;K16;HP;XDP;QP"
 include(cmake/kinds.cmake)
 
 add_subdirectory(src)
-include(CTest)
-add_subdirectory(tests)
+
+if(${BUILD_TESTING})
+    include(CTest)
+    add_subdirectory(tests)
+endif()
 
 install(TARGETS autodiff
     ARCHIVE DESTINATION lib
