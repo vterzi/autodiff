@@ -65,6 +65,18 @@ module unittest
 #undef _FILE
 
 contains
+    pure function msg_src(file, line) result(msg)
+        character(len=*), intent(in), optional :: file
+        integer, intent(in), optional :: line
+        character(len=:), allocatable :: msg
+
+        msg = ''
+        if (present(file)) msg = msg // file // ':'
+        if (present(line)) msg = msg // line // ':'
+        if (len(msg) > 0) msg = msg // ' '
+    end function msg_src
+
+
     pure function unravel_idx(idx, dims) result(idxs)
         integer, intent(in) :: idx, dims(:)
         integer :: idxs(size(dims))
