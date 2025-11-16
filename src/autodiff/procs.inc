@@ -280,9 +280,6 @@ elemental function _PROC(x, y) result(r)
     _RES_TYPE :: t
 #  if (_DERIV_ID1 == _VAL) || (_DERIV_ID2 == _VAL)
     _ELEM_TYPE0 :: v, f1, f2
-#    if (_DERIV_ID1 != _VAL)
-    _ELEM_TYPE0 :: f
-#    endif
 #    if _DERIV_ID0 == _GRADGRAD
     integer :: i, lo, up
 #    endif
@@ -292,12 +289,11 @@ elemental function _PROC(x, y) result(r)
     t = x
     v = _CONV0(y)
     r%v = t%v**v
-    f = 1 / t%v
-    f2 = v * f
-    f1 = f2 * r%v
+    f2 = v - 1
+    f1 = v * t%v**f2
     r%g = f1 * t%g
 #    if _DERIV_ID0 > _GRAD
-    f2 = f2 - f
+    f2 = v * f2 * t%v**(v - 2)
 #    endif
 #    if _DERIV_ID0 == _GRADGRAD
     allocate(r%gg(size(t%gg)))
@@ -305,10 +301,10 @@ elemental function _PROC(x, y) result(r)
     do i = 1, size(r%g)
         lo = up + 1
         up = up + i
-        r%gg(lo:up) = f1 * t%gg(lo:up) + f2 * r%g(i) * t%g(:i)
+        r%gg(lo:up) = f1 * t%gg(lo:up) + f2 * t%g(i) * t%g(:i)
     end do
 #    elif _DERIV_ID0 == _DIVGRAD
-    r%dg = f1 * t%dg + f2 * dot_product(r%g, t%g)
+    r%dg = f1 * t%dg + f2 * dot_product(t%g, t%g)
 #    endif
 #  elif (_DERIV_ID1 == _VAL) && (_DERIV_ID2 != _VAL)
     v = _CONV0(x)
