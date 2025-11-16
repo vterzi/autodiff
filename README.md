@@ -57,3 +57,53 @@ intrinsic types.
    ```
    - The `LD_LIBRARY_PATH` adjustment is required only if the library was built
    as a shared library (`-DBUILD_SHARED_LIBS=on`).
+
+
+## Example
+
+```fortran
+program qmc_example
+    use autodiff
+
+    implicit none
+
+    real, parameter :: &
+        zeta = 1.24, &
+        nucs(3, 2) = reshape([0.0, 0.0, 0.7, 0.0, 0.0, -0.7], shape(nucs))
+
+    integer :: i, j, k
+    real :: energy, v(6), g(6)
+    type(DivgradRSP) :: elecs(3, 2), dists(2, 2), func
+
+    v = [0.7, 0.0, 0.7, 0.7, 0.0, -0.7]
+    g = 0
+    k = 0
+    do i = 1, size(elecs, 2)
+        do j = 1, size(elecs, 1)
+            k = k + 1
+            g(k) = 1
+            elecs(j, i) = DivgradRSP(v(k), g, 0.0)
+            g(k) = 0
+        end do
+    end do
+    do i = 1, size(elecs, 2)
+        do j = 1, size(nucs, 2)
+            dists(j, i) = norm2(elecs(:, i) - nucs(:, j))
+        end do
+    end do
+    func = ( &
+        (exp(-zeta * dists(1, 1)) + exp(-zeta * dists(2, 1))) &
+        * (exp(-zeta * dists(1, 2)) + exp(-zeta * dists(2, 2))) &
+    )
+    energy = ( &
+        -func%divgrad() / (2 * func%val()) &
+        - 1 / dists(1, 1)%val() &
+        - 1 / dists(2, 1)%val() &
+        - 1 / dists(1, 2)%val() &
+        - 1 / dists(2, 2)%val() &
+        + 1 / norm2(elecs(:, 1)%val() - elecs(:, 2)%val()) &
+        + 1 / norm2(nucs(:, 1) - nucs(:, 2)) &
+    )
+    print *, energy
+end program qmc_example
+```
