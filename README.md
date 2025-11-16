@@ -46,7 +46,7 @@ intrinsic types.
 1. Compile your source files using the library:
    ```sh
    <compiler> -I<install-path>/include \
-              <source-files> [<another-source-file>...] \
+              <source-file> [<another-source-file>...] \
               -L<install-path>/lib -lautodiff \
               -o <executable>
    ```
