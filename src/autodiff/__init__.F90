@@ -138,6 +138,8 @@ module autodiff
 #include "iface.inc"
 #define _OP erfc_scaled
 #include "iface.inc"
+#define _OP norm2
+#include "iface.inc"
 #undef _TYPE_IDS
 
 #undef _DERIV_IDS
@@ -203,6 +205,9 @@ module autodiff
 #include "iface.inc"
 #define _OP operator(**)
 #define _OP_NAME pow
+#include "iface.inc"
+#define _OP dot_product
+#define _OP_NAME _OP
 #include "iface.inc"
 #undef _TYPE_IDS2
 #undef _DERIV_IDS2

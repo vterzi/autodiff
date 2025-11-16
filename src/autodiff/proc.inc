@@ -1252,4 +1252,51 @@ elemental function _PROC(x) result(r)
 #  endif
 end function _PROC
 #  undef _PROC
+
+
+#  define _PROC _TYPE_UNARY_OP(norm2)
+pure function _PROC(array) result(r)
+    class(_NAME), intent(in) :: array(:)
+    type(_NAME) :: r
+
+    integer :: m, n, j
+    type(_NAME) :: x
+#  if _DERIV_ID == _GRADGRAD
+    integer :: i, lo, up
+#  endif
+
+    m = size(array)
+    r%v = 0
+    n = merge(huge(n), 0, m > 0)
+    do j = 1, m
+        n = min(n, size(array(j)%g))
+    end do
+    allocate(r%g(n))
+    r%g = 0
+#  if _DERIV_ID == _GRADGRAD
+    allocate(r%gg(n * (n + 1) / 2))
+    r%gg = 0
+#  elif _DERIV_ID == _DIVGRAD
+    r%dg = 0
+#  endif
+    do j = 1, m
+        x = array(j)
+        r%v = r%v + x%v**2
+        r%g = r%g + 2 * x%v * x%g
+#  if _DERIV_ID == _GRADGRAD
+        up = 0
+        do i = 1, n
+            lo = up + 1
+            up = up + i
+            r%gg(lo:up) = r%gg(lo:up) + 2 * ( &
+                x%v * x%gg(lo:up) + x%g(i) * x%g(:i) &
+            )
+        end do
+#  elif _DERIV_ID == _DIVGRAD
+        r%dg = r%dg + 2 * (x%v * x%dg + dot_product(x%g, x%g))
+#  endif
+    end do
+    r = sqrt(r)
+end function _PROC
+#  undef _PROC
 #endif
