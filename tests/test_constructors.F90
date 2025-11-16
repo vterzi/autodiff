@@ -17,7 +17,7 @@ program test_constructors
         4.0, 5.0, &
         5.0, 6.0 &
     ], [2, 2]))
-    dg = sum([(gg(i, i), i = 1, size(gg, 1))])
+    dg = sum([(gg(i, i), i = 1, minval(shape(gg)))])
 
     go = GradRSP(v, g)
     call assert_equal(go%val(), v, file=__FILE__, line=__LINE__)
