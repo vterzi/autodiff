@@ -70,7 +70,7 @@ end function _PROC
 
 
 #define _PROC _TYPE_UNARY_OP(val)
-pure function _PROC(x) result(val)
+elemental function _PROC(x) result(val)
     class(_NAME), intent(in) :: x
     _ELEM_TYPE :: val
 
