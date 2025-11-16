@@ -24,7 +24,9 @@ module unittest
     implicit none
 
 #define _FILE "decl.inc"
-#define _DIM_IDS (_DIM0 | _DIM1 | _DIM2 | _DIM3 | _DIM4 | _DIM5 | _DIM6 | _DIM7)
+#define _DIM_IDS ( \
+    _DIM0 | _DIM1 | _DIM2 | _DIM3 | _DIM4 | _DIM5 | _DIM6 | _DIM7 \
+)
 
 #define _TYPE_IDS (_LOGICAL | _INTEGER | _REAL | _COMPLEX)
 #define _PROC _CAT3(_OP,_,_LABEL)
@@ -54,9 +56,13 @@ module unittest
 #define _TYPE_IDS (_INTEGER | _REAL | _COMPLEX)
 #define _OP assert_equal
 #include "iface.inc"
+#define _OP assert_not_equal
+#include "iface.inc"
 #undef _TYPE_IDS
 #define _TYPE_IDS (_REAL | _COMPLEX)
 #define _OP assert_close
+#include "iface.inc"
+#define _OP assert_not_close
 #include "iface.inc"
 #undef _TYPE_IDS
 #undef _PROC
@@ -91,7 +97,9 @@ contains
     end function unravel_idx
 
 
-#define _DIM_IDS (_DIM0 | _DIM1 | _DIM2 | _DIM3 | _DIM4 | _DIM5 | _DIM6 | _DIM7)
+#define _DIM_IDS ( \
+    _DIM0 | _DIM1 | _DIM2 | _DIM3 | _DIM4 | _DIM5 | _DIM6 | _DIM7 \
+)
 #define _TYPE_IDS (_LOGICAL | _INTEGER | _REAL | _COMPLEX)
 #define _FILE "to_character.inc"
 #include "dims.inc"
